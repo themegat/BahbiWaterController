@@ -5,6 +5,7 @@
 #include <ESP8266WiFi.h>
 #endif
 #include <aWOT.h>
+#include "Event.h"
 
 #ifndef HttpServer_h
 #define HttpServer_h

@@ -7,6 +7,10 @@
 #include "Configuration.h"
 #include "PumpSpeed.h"
 #include "HttpServer.h"
+#include "Event.h"
+
+#include "PumpStartEvent.h"
+#include "PumpStopEvent.h"
 
 PumpController pumpCtrl(4, 13, 12, 14);
 
@@ -19,6 +23,10 @@ void serverListen();
 Task taskServer(1, TASK_FOREVER, &serverListen);
 
 Scheduler runner;
+EventManager evtManager;
+
+PumpStartEvent pumpStartEvent;
+PumpStopEvent pumpStopEvent;
 
 void setup()
 {
@@ -30,6 +38,9 @@ void setup()
 
   httpServer.start();
   taskServer.enable();
+
+  evtManager.subscribe(Subscriber("run", &pumpStartEvent));
+  evtManager.subscribe(Subscriber("stop", &pumpStopEvent));
 }
 
 void loop()
@@ -41,4 +52,3 @@ void serverListen()
 {
   httpServer.serverListen();
 }
-

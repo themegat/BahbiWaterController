@@ -4,6 +4,7 @@
 
 extern WiFiServer server;
 extern Application app;
+extern EventManager evtManager;
 
 void index(Request &req, Response &res)
 {
@@ -12,6 +13,10 @@ void index(Request &req, Response &res)
 
 void run(Request &req, Response &res)
 {
+    Event slow("run", "s");
+    Event medium("run", "m");
+    Event high("run", "h");
+
     const int charLen = 10;
     char paramSpeed[charLen];
 
@@ -22,16 +27,16 @@ void run(Request &req, Response &res)
     switch (speed)
     {
     case 1:
-        // pumpCtrl.run(SLOW);
-        result = "Pump running - LOW";
+        result = "LOW";
+        evtManager.trigger(slow);
         break;
     case 2:
-        // pumpCtrl.run(SMEDIUM);
-        result = "Pump running - MEDIUM";
+        result = "MEDIUM";
+        evtManager.trigger(medium);
         break;
     case 3:
-        // pumpCtrl.run(SHIGH);
-        result = "Pump running - HIGH";
+        result = "HIGH";
+        evtManager.trigger(high);
         break;
     default:
         // pumpCtrl.stop();
@@ -39,15 +44,14 @@ void run(Request &req, Response &res)
         break;
     }
 
-    Serial.println(result);
     res.print("Waterer :: " + result);
 }
 
 void stopPump(Request &req, Response &res)
 {
-    // pumpCtrl.stop();
+    Event stop("stop");
     String result = "Pump stopped";
-    Serial.println(result);
+    evtManager.trigger(stop);
     res.print("Waterer :: " + result);
 }
 
@@ -81,11 +85,12 @@ void HttpServer::start()
     server.begin();
 }
 
-void HttpServer::serverListen(){
- WiFiClient client = server.available();
+void HttpServer::serverListen()
+{
+    WiFiClient client = server.available();
 
-  if (client.connected())
-  {
-    app.process(&client);
-  }
+    if (client.connected())
+    {
+        app.process(&client);
+    }
 }
