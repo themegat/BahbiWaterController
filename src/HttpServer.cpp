@@ -1,6 +1,9 @@
+#include <cstring>
+#include <string> 
 #include "HttpServer.h"
 #include <ESP8266WiFi.h>
 #include <aWOT.h>
+#include "PumpSpeed.h"
 
 extern WiFiServer server;
 extern Application app;
@@ -13,9 +16,9 @@ void index(Request &req, Response &res)
 
 void run(Request &req, Response &res)
 {
-    Event slow("run", "s");
-    Event medium("run", "m");
-    Event high("run", "h");
+    Event slow("run", &pumpSpeedStr(SLOW)[0]);
+    Event medium("run", &pumpSpeedStr(SMEDIUM)[0]);
+    Event high("run", &pumpSpeedStr(SHIGH)[0]);
 
     const int charLen = 10;
     char paramSpeed[charLen];
@@ -27,15 +30,15 @@ void run(Request &req, Response &res)
     switch (speed)
     {
     case 1:
-        result = "LOW";
+        result = pumpSpeedStr(SLOW);
         evtManager.trigger(slow);
         break;
     case 2:
-        result = "MEDIUM";
+        result = pumpSpeedStr(SMEDIUM);
         evtManager.trigger(medium);
         break;
     case 3:
-        result = "HIGH";
+        result = pumpSpeedStr(SHIGH);
         evtManager.trigger(high);
         break;
     default:

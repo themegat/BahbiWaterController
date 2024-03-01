@@ -5,10 +5,9 @@
 #ifndef PumpStartEvent_h
 #define PumpStartEvent_h
 
-class PumpStartEvent: public EventTask
+class PumpStartEvent : public EventTask
 {
 private:
-
 public:
     PumpStartEvent();
     ~PumpStartEvent();
@@ -17,30 +16,30 @@ public:
 
 extern PumpController pumpCtrl;
 
-PumpStartEvent::~PumpStartEvent() {
-
+PumpStartEvent::~PumpStartEvent()
+{
 }
-PumpStartEvent::PumpStartEvent() {
-    
+PumpStartEvent::PumpStartEvent()
+{
 }
 
 void PumpStartEvent::execute(Event evt)
 {
     String speed = evt.extra;
-    if (speed == "s")
+    if (speed == pumpSpeedStr(SLOW))
     {
         pumpCtrl.run(SLOW);
-        Serial.println("Event - SLOW");
+        Serial.println("Event Speed: " + speed);
     }
-    else if (speed == "m")
+    else if (speed == pumpSpeedStr(SMEDIUM))
     {
         pumpCtrl.run(SMEDIUM);
-        Serial.println("Event - SMEDIUM");
+        Serial.println("Event Speed: " + speed);
     }
-    else if (speed == "h")
+    else if (speed == pumpSpeedStr(SHIGH))
     {
         pumpCtrl.run(SHIGH);
-        Serial.println("Event - SHIGH");
+        Serial.println("EvenEvent Speed: " + speed);
     }
 }
 #endif
