@@ -8,6 +8,8 @@
 #include "PumpSpeed.h"
 #include "HttpServer.h"
 #include "Event.h"
+#include "FireInterface.h"
+#include <Firebase_ESP_Client.h>
 
 #include "PumpStartEvent.h"
 #include "PumpStopEvent.h"
@@ -28,6 +30,9 @@ EventManager evtManager;
 PumpStartEvent pumpStartEvent;
 PumpStopEvent pumpStopEvent;
 
+FirebaseData fbdo;
+FireInterface fire(Configuration::fireApiKey, Configuration::fireDatabaseUrl);
+
 void setup()
 {
   Serial.begin(9600);
@@ -39,12 +44,16 @@ void setup()
   httpServer.start();
   taskServer.enable();
 
+  fire.connect();
+  fire.subscribe(&fbdo, "/test/controller/data");
+
   evtManager.subscribe(Subscriber("run", &pumpStartEvent));
   evtManager.subscribe(Subscriber("stop", &pumpStopEvent));
 }
 
 void loop()
 {
+  fire.start();
   runner.execute();
 }
 
