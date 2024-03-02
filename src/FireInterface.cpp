@@ -1,42 +1,34 @@
 #include "FireInterface.h"
 #include "addons/RTDBHelper.h"
 #include "addons/TokenHelper.h"
+#include "FireSubscriptions.h"
 
 FirebaseAuth auth;
 FirebaseConfig config;
-// FirebaseData stream;
 
 bool signupOK = false;
-String childPath[2] = {"/start", "/data"};
-
-extern EventManager evtManager;
 
 void streamCallback(FirebaseStream data)
 {
-    Serial.println("Data path: " + data.dataPath());
+    // Serial.println("Data path: " + data.dataPath());
     // Print out the value
     // Stream data can be many types which can be determined from function dataType
     if (data.dataTypeEnum() == firebase_rtdb_data_type_integer)
+    {
         Serial.println(data.to<int>());
+    }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_float)
         Serial.println(data.to<float>(), 5);
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_double)
         printf("%.9lf\n", data.to<double>());
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_boolean)
     {
-        if (data.to<bool>() == true)
-        {
-            Event start("run", "MEDIUM");
-            evtManager.trigger(start);
-        }
-        else
-        {
-            Event stop("stop");
-            evtManager.trigger(stop);
-        }
+        FireSubscriptions::switchOn(data.dataPath(), data.to<bool>());
     }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_string)
-        Serial.println(data.to<String>());
+    {
+        FireSubscriptions::pumpPressure(data.dataPath(), data.to<String>());
+    }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_json)
     {
         FirebaseJson *json = data.to<FirebaseJson *>();
@@ -58,10 +50,11 @@ void streamTimeoutCallback(bool timeout)
     }
 }
 
-FireInterface::FireInterface(String apiKey, String databaseUrl)
+FireInterface::FireInterface(String apiKey, String databaseUrl, String deviceID)
 {
     _apiKey = apiKey;
     _dbUrl = databaseUrl;
+    _deviceID = deviceID;
 }
 
 FireInterface::~FireInterface()
@@ -78,7 +71,7 @@ void FireInterface::connect()
     /* Sign up */
     if (Firebase.signUp(&config, &auth, "", ""))
     {
-        Serial.println("ok");
+        Serial.println("Connected to Firebase");
         signupOK = true;
     }
     else
@@ -103,12 +96,13 @@ void FireInterface::start()
 
 void FireInterface::subscribe(FirebaseData *fbdo, String path)
 {
-    Serial.println("Subscribe to " + path);
+    String fullPath = "/" + _deviceID + "/" + path;
+    Serial.println("Subscribed to " + fullPath);
     Firebase.RTDB.setStreamCallback(fbdo, streamCallback, streamTimeoutCallback);
 
     // In setup(), set the streaming path to "/test/data" and begin stream connection
 
-    if (!Firebase.RTDB.beginStream(fbdo, path))
+    if (!Firebase.RTDB.beginStream(fbdo, fullPath))
     {
         // Could not begin stream connection, then print out the error detail
         Serial.println(fbdo->errorReason());

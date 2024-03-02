@@ -11,8 +11,9 @@
 #include "FireInterface.h"
 #include <Firebase_ESP_Client.h>
 
-#include "PumpStartEvent.h"
-#include "PumpStopEvent.h"
+#include "events/PumpStartEvent.h"
+#include "events/PumpStopEvent.h"
+#include "events/PumpSpeedEvent.h"
 
 #include <string>
 #include <iostream>
@@ -33,9 +34,10 @@ EventManager evtManager;
 
 PumpStartEvent pumpStartEvent;
 PumpStopEvent pumpStopEvent;
+PumpSpeedEvent pumpSpeedEvent;
 
 FirebaseData fbdo;
-FireInterface fire(Configuration::fireApiKey, Configuration::fireDatabaseUrl);
+FireInterface fire(Configuration::fireApiKey, Configuration::fireDatabaseUrl, Configuration::fireDeviceID);
 
 NetTime netTime(Configuration::timeZone, 0, Configuration::ntpServer);
 
@@ -53,10 +55,11 @@ void setup()
   taskServer.enable();
 
   fire.connect();
-  fire.subscribe(&fbdo, "/test/controller/data");
+  fire.subscribe(&fbdo, "state");
 
   evtManager.subscribe(Subscriber("run", &pumpStartEvent));
   evtManager.subscribe(Subscriber("stop", &pumpStopEvent));
+  evtManager.subscribe(Subscriber("setSpeed", &pumpSpeedEvent));
 }
 
 void loop()

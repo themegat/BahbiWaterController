@@ -28,7 +28,6 @@ PumpStopEvent::~PumpStopEvent()
 void PumpStopEvent::execute(Event evt)
 {
     pumpCtrl.stop();
-    Serial.println("Event - STOP");
 }
 
 

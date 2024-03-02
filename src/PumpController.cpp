@@ -12,27 +12,29 @@ PumpController::PumpController(int transistor1, int transistor2, int transistor3
     _transistor3 = transistor3;
     pinMode(transistor4, OUTPUT);
     _transistor4 = transistor4;
+    _speed = PumpSpeed::SMEDIUM;
 }
 
 void PumpController::run(PumpSpeed speed)
 {
+    _speed = speed;
     if (_running)
     {
         stop();
     }
 
-    if (speed == SLOW)
+    if (_speed == SLOW)
     {
         digitalWrite(_transistor1, HIGH);
         digitalWrite(_transistor2, HIGH);
     }
-    else if (speed == SMEDIUM)
+    else if (_speed == SMEDIUM)
     {
         digitalWrite(_transistor1, HIGH);
         digitalWrite(_transistor2, HIGH);
         digitalWrite(_transistor3, HIGH);
     }
-    else if (speed == SHIGH)
+    else if (_speed == SHIGH)
     {
         digitalWrite(_transistor1, HIGH);
         digitalWrite(_transistor2, HIGH);
@@ -40,6 +42,7 @@ void PumpController::run(PumpSpeed speed)
         digitalWrite(_transistor4, HIGH);
     }
     _running = true;
+    Serial.println("PumpController - Running at : " + pumpSpeedStr(_speed));
 }
 
 void PumpController::stop()
@@ -49,4 +52,16 @@ void PumpController::stop()
     digitalWrite(_transistor3, LOW);
     digitalWrite(_transistor4, LOW);
     _running = false;
+    Serial.println("PumpController - Stopped");
+}
+
+void PumpController::setSpeed(PumpSpeed speed)
+{
+    _speed = speed;
+    Serial.println("PumpController - Speed set to : " + pumpSpeedStr(_speed));
+}
+
+PumpSpeed PumpController::getSpeed()
+{
+    return _speed;
 }
