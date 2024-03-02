@@ -14,6 +14,10 @@
 #include "PumpStartEvent.h"
 #include "PumpStopEvent.h"
 
+#include <string>
+#include <iostream>
+#include "NetTime.h"
+
 PumpController pumpCtrl(4, 13, 12, 14);
 
 WiFiServer server(80);
@@ -33,6 +37,8 @@ PumpStopEvent pumpStopEvent;
 FirebaseData fbdo;
 FireInterface fire(Configuration::fireApiKey, Configuration::fireDatabaseUrl);
 
+NetTime netTime(Configuration::timeZone, 0, Configuration::ntpServer);
+
 void setup()
 {
   Serial.begin(9600);
@@ -42,6 +48,8 @@ void setup()
   runner.addTask(taskServer);
 
   httpServer.start();
+  netTime.init();
+
   taskServer.enable();
 
   fire.connect();
@@ -49,6 +57,8 @@ void setup()
 
   evtManager.subscribe(Subscriber("run", &pumpStartEvent));
   evtManager.subscribe(Subscriber("stop", &pumpStopEvent));
+
+  Serial.println("The time is - " + netTime.getTimeString());
 }
 
 void loop()
