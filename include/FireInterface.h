@@ -10,11 +10,10 @@ class FireInterface
 private:
     String _apiKey;
     String _dbUrl;
-    String _childPath[2];
-    EventManager _evManager;
+    String _deviceID;
 
 public:
-    FireInterface(String apiKey, String databaseUrl);
+    FireInterface(String apiKey, String databaseUrl, String deviceID);
     ~FireInterface();
     void connect();
     void start();
