@@ -11,10 +11,11 @@ NetTime::NetTime(long timeZone, int dayLightOffset, String ntpServer)
 void NetTime::init()
 {
     configTime(_gmtOffsetSec, _dayLightOffsetSec, _ntpServer);
-    Serial.println("Network Time: setting time infomation ");
+    Serial.print("Network Time: setting time infomation ");
     int count = 0;
-    int retryDelay = 1000;
-    int countRetry = 5;
+    int retryDelay = 100;
+    int countRetry = 30;
+    bool timeInfoSet = false;
     do
     {
         if (!getLocalTime(&_timeinfo))
@@ -26,8 +27,17 @@ void NetTime::init()
         else
         {
             count = countRetry;
+            Serial.println();
+            Serial.println("The time is - " + getTimeString());
+            timeInfoSet = true;
         }
     } while (count < countRetry);
+
+    if (!timeInfoSet)
+    {
+        Serial.println();
+        Serial.println("Failed to set time information");
+    }
 }
 
 String NetTime::getDayOfMonth()

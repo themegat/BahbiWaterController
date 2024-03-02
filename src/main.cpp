@@ -57,8 +57,6 @@ void setup()
 
   evtManager.subscribe(Subscriber("run", &pumpStartEvent));
   evtManager.subscribe(Subscriber("stop", &pumpStopEvent));
-
-  Serial.println("The time is - " + netTime.getTimeString());
 }
 
 void loop()
