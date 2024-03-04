@@ -1,6 +1,7 @@
 #include "PumpController.h"
 #include <Arduino.h>
 #include "PumpSpeed.h"
+#include "TimeUtil.h"
 
 PumpController::PumpController(int transistor1, int transistor2, int transistor3, int transistor4)
 {
@@ -13,7 +14,7 @@ PumpController::PumpController(int transistor1, int transistor2, int transistor3
     pinMode(transistor4, OUTPUT);
     _transistor4 = transistor4;
     _speed = PumpSpeed::SMEDIUM;
-    _runDuration = 2;
+    _runDuration = 5;
 }
 
 void PumpController::run(PumpSpeed speed)
@@ -76,4 +77,40 @@ void PumpController::setRunDuration(int duration)
 int PumpController::getRunDuration()
 {
     return _runDuration;
+}
+
+void PumpController::setSchedules(std::vector<String> schedules)
+{
+    _schedules = schedules;
+    Serial.println("PumpController - Following schedules added");
+    for (String sc : _schedules)
+    {
+        Serial.println("Schedule :: " + sc);
+    }
+}
+
+std::vector<String> PumpController::getSchedules()
+{
+    return _schedules;
+}
+
+String PumpController::getNextSchedule(String currentTime)
+{
+    int currentTimeStamp = TimeUtil::toTimeStamp(currentTime);
+    std::vector<String> temp;
+    for (String sc : _schedules)
+    {
+        temp.push_back(sc);
+    }
+    std::sort(temp.begin(), temp.end());
+    String result = temp.at(0);
+    for (String sc : temp)
+    {
+        int timeStamp = TimeUtil::toTimeStamp(sc);
+        if (currentTimeStamp <= timeStamp)
+        {
+            result = sc;
+        }
+    }
+    return result;
 }

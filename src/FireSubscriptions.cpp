@@ -1,6 +1,7 @@
 #include "FireSubscriptions.h"
 #include "EventNames.h"
 #include <iostream>
+
 using namespace std;
 
 extern EventManager evtManager;
@@ -45,6 +46,21 @@ boolean FireSubscriptions::runDurationSeconds(String path, int state)
         itoa(state, value, 10);
         Event event(EventNames::SetPumpRunDuration, value);
         evtManager.trigger(event);
+        return true;
+    }
+    return false;
+}
+
+boolean FireSubscriptions::pumpSchedule(String path, String state)
+{
+    if (path.indexOf("scheduledRunTimes") != -1)
+    {
+        state.replace("[", "");
+        state.replace("]", "");
+        state.replace("\"", "");
+        Event event(EventNames::SetPumpSchedule, state.c_str());
+        evtManager.trigger(event);
+
         return true;
     }
     return false;

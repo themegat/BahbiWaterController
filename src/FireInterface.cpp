@@ -1,12 +1,25 @@
 #include "FireInterface.h"
+#include <TaskSchedulerDeclarations.h>
+#include "NetTime.h"
+#include "TimeUtil.h"
+#include <Arduino.h>
+#include <vector>
+#include "FireSubscriptions.h"
+#include <Firebase_ESP_Client.h>
 #include "addons/RTDBHelper.h"
 #include "addons/TokenHelper.h"
-#include "FireSubscriptions.h"
+
+#include "PumpController.h"
 
 FirebaseAuth auth;
 FirebaseConfig config;
 
 bool signupOK = false;
+
+extern Task taskStartMotor;
+extern NetTime netTime;
+
+extern PumpController pumpCtrl;
 
 #pragma region private
 void FireInterface::_streamCallback(FirebaseStream data)
@@ -30,6 +43,7 @@ void FireInterface::_streamCallback(FirebaseStream data)
     }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_string)
     {
+        Serial.println("String");
         Serial.println(data.to<String>());
         // FireSubscriptions::pumpPressure(data.dataPath(), data.to<String>());
         // FireSubscriptions::runDurationSeconds(data.dataPath(), data.to<String>());
@@ -37,10 +51,24 @@ void FireInterface::_streamCallback(FirebaseStream data)
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_json)
     {
         FirebaseJson *json = data.to<FirebaseJson *>();
+
+        FirebaseJsonData scheduleData;
+        json->get(scheduleData, "scheduledRunTimes");
+        FireSubscriptions::pumpSchedule("scheduledRunTimes", scheduleData.to<String>());
+
+        FirebaseJsonData durationData;
+        json->get(durationData, "runDurationSeconds");
+        FireSubscriptions::runDurationSeconds("runDurationSeconds", durationData.to<int>());
+
+        FirebaseJsonData pressureData;
+        json->get(pressureData, "pumpPressure");
+        FireSubscriptions::pumpPressure("pumpPressure", pressureData.to<int>());
+
         Serial.println(json->raw());
     }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_array)
     {
+        Serial.println("Array");
         FirebaseJsonArray *arr = data.to<FirebaseJsonArray *>();
         Serial.println(arr->raw());
     }

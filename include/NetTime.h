@@ -15,6 +15,7 @@ public:
     String getYear();
     String getHour();
     String getMinute();
+    String getSecond();
     String getTimeString();
     int toNumber(char *value);
 

@@ -1,4 +1,7 @@
+
 #include "PumpSpeed.h"
+#include <vector>
+#include <Arduino.h>
 
 #ifndef PumpController_h
 #define PumpController_h
@@ -13,6 +16,9 @@ public:
     PumpSpeed getSpeed();
     void setRunDuration(int duration);
     int getRunDuration();
+    void setSchedules(std::vector<String> schedules);
+    std::vector<String> getSchedules();
+    String getNextSchedule(String currentTime);
 
 private:
     int _transistor1;
@@ -22,6 +28,7 @@ private:
     bool _running;
     PumpSpeed _speed;
     int _runDuration;
+    std::vector<String> _schedules;
 };
 
 #endif

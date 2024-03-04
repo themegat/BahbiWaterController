@@ -7,7 +7,9 @@ class EventNames {
         static char *StartPump;
         static char *StopPump;
         static char *SetPumpPressure;
-
+        static char *SetPumpSchedule;
+        static char *ScheduleStart;
+        static char *ScheduleStop;
 };
 
 #endif
