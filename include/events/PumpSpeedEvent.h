@@ -27,15 +27,22 @@ PumpSpeedEvent::~PumpSpeedEvent()
 
 void PumpSpeedEvent::execute(Event evt)
 {
-    String value = evt.extra;
+    int value = atoi(evt.extra);
     PumpSpeed speed;
-    if(value == "1"){
+    if (value == 1)
+    {
         speed = PumpSpeed::SLOW;
-    }else  if(value == "2"){
+    }
+    else if (value == 2)
+    {
         speed = PumpSpeed::SMEDIUM;
-    }else  if(value == "3"){
+    }
+    else if (value == 3)
+    {
         speed = PumpSpeed::SHIGH;
-    }else{
+    }
+    else
+    {
         speed = PumpSpeed::SMEDIUM;
     }
 

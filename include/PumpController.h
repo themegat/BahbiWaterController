@@ -11,6 +11,8 @@ public:
     void stop();
     void setSpeed(PumpSpeed speed);
     PumpSpeed getSpeed();
+    void setRunDuration(int duration);
+    int getRunDuration();
 
 private:
     int _transistor1;
@@ -19,6 +21,7 @@ private:
     int _transistor4;
     bool _running;
     PumpSpeed _speed;
+    int _runDuration;
 };
 
 #endif

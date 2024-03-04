@@ -1,4 +1,5 @@
 #include "FireSubscriptions.h"
+#include "EventNames.h"
 #include <iostream>
 using namespace std;
 
@@ -10,12 +11,12 @@ boolean FireSubscriptions::switchOn(String path, boolean state)
     {
         if (state)
         {
-            Event event("run", "MEDIUM");
+            Event event(EventNames::StartPump);
             evtManager.trigger(event);
         }
         else
         {
-            Event event("stop");
+            Event event(EventNames::StopPump);
             evtManager.trigger(event);
         }
         return true;
@@ -23,11 +24,26 @@ boolean FireSubscriptions::switchOn(String path, boolean state)
     return false;
 };
 
-boolean FireSubscriptions::pumpPressure(String path, String state)
+boolean FireSubscriptions::pumpPressure(String path, int state)
 {
     if (path.indexOf("pumpPressure") != -1)
     {
-        Event event("setSpeed", state.c_str());
+        char *value = "";
+        itoa(state, value, 10);
+        Event event(EventNames::SetPumpPressure, value);
+        evtManager.trigger(event);
+        return true;
+    }
+    return false;
+}
+
+boolean FireSubscriptions::runDurationSeconds(String path, int state)
+{
+    if (path.indexOf("runDurationSeconds") != -1)
+    {
+        char *value = "";
+        itoa(state, value, 10);
+        Event event(EventNames::SetPumpRunDuration, value);
         evtManager.trigger(event);
         return true;
     }

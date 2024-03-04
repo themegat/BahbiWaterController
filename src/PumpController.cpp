@@ -13,6 +13,7 @@ PumpController::PumpController(int transistor1, int transistor2, int transistor3
     pinMode(transistor4, OUTPUT);
     _transistor4 = transistor4;
     _speed = PumpSpeed::SMEDIUM;
+    _runDuration = 2;
 }
 
 void PumpController::run(PumpSpeed speed)
@@ -64,4 +65,15 @@ void PumpController::setSpeed(PumpSpeed speed)
 PumpSpeed PumpController::getSpeed()
 {
     return _speed;
+}
+
+void PumpController::setRunDuration(int duration)
+{
+    _runDuration = duration;
+    Serial.println("PumpController - Run duration set to : " + String(duration));
+}
+
+int PumpController::getRunDuration()
+{
+    return _runDuration;
 }

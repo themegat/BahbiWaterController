@@ -14,6 +14,9 @@
 #include "events/PumpStartEvent.h"
 #include "events/PumpStopEvent.h"
 #include "events/PumpSpeedEvent.h"
+#include "events/PumpRunDurationEvent.h"
+
+#include "EventNames.h"
 
 #include <string>
 #include <iostream>
@@ -35,6 +38,7 @@ EventManager evtManager;
 PumpStartEvent pumpStartEvent;
 PumpStopEvent pumpStopEvent;
 PumpSpeedEvent pumpSpeedEvent;
+PumpRunDurationEvent pumpRunDurationEvent;
 
 FirebaseData fbdo;
 FireInterface fire(Configuration::fireApiKey, Configuration::fireDatabaseUrl, Configuration::fireDeviceID);
@@ -57,9 +61,10 @@ void setup()
   fire.connect();
   fire.subscribe(&fbdo, "state");
 
-  evtManager.subscribe(Subscriber("run", &pumpStartEvent));
-  evtManager.subscribe(Subscriber("stop", &pumpStopEvent));
-  evtManager.subscribe(Subscriber("setSpeed", &pumpSpeedEvent));
+  evtManager.subscribe(Subscriber(EventNames::StartPump, &pumpStartEvent));
+  evtManager.subscribe(Subscriber(EventNames::StopPump, &pumpStopEvent));
+  evtManager.subscribe(Subscriber(EventNames::SetPumpPressure, &pumpSpeedEvent));
+  evtManager.subscribe(Subscriber(EventNames::SetPumpRunDuration, &pumpRunDurationEvent));
 }
 
 void loop()
