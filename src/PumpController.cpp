@@ -104,12 +104,14 @@ String PumpController::getNextSchedule(String currentTime)
     }
     std::sort(temp.begin(), temp.end());
     String result = temp.at(0);
+
     for (String sc : temp)
     {
         int timeStamp = TimeUtil::toTimeStamp(sc);
         if (currentTimeStamp <= timeStamp)
         {
             result = sc;
+            break;
         }
     }
     return result;
