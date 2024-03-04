@@ -1,7 +1,7 @@
 #include <Arduino.h>
-#include <TaskScheduler.h>
 #include <ESP8266WiFi.h>
 #include <aWOT.h>
+#include <TaskSchedulerDeclarations.h>
 
 #include "PumpController.h"
 #include "Configuration.h"
@@ -14,6 +14,13 @@
 #include "events/PumpStartEvent.h"
 #include "events/PumpStopEvent.h"
 #include "events/PumpSpeedEvent.h"
+#include "events/PumpRunDurationEvent.h"
+#include "events/PumpScheduleEvent.h"
+#include "events/SchedulePumpStartEvent.h"
+#include "events/SchedulePumpStopEvent.h"
+
+
+#include "EventNames.h"
 
 #include <string>
 #include <iostream>
@@ -35,11 +42,23 @@ EventManager evtManager;
 PumpStartEvent pumpStartEvent;
 PumpStopEvent pumpStopEvent;
 PumpSpeedEvent pumpSpeedEvent;
+PumpRunDurationEvent pumpRunDurationEvent;
+PumpScheduleEvent pumpScheduleEvent;
+SchedulePumpStartEvent schedulePumpStartEvent;
+SchedulePumpStopEvent schedulePumpStopEvent;
 
 FirebaseData fbdo;
 FireInterface fire(Configuration::fireApiKey, Configuration::fireDatabaseUrl, Configuration::fireDeviceID);
 
 NetTime netTime(Configuration::timeZone, 0, Configuration::ntpServer);
+
+void eventStartPump();
+void eventStopPump();
+
+Scheduler sc;
+
+Task taskStartPump(TASK_ONCE, TASK_ONCE, &eventStartPump);
+Task taskStopPump(TASK_ONCE, TASK_ONCE, &eventStopPump);
 
 void setup()
 {
@@ -48,6 +67,8 @@ void setup()
 
   runner.init();
   runner.addTask(taskServer);
+  runner.addTask(taskStartPump);
+  runner.addTask(taskStopPump);
 
   httpServer.start();
   netTime.init();
@@ -57,9 +78,13 @@ void setup()
   fire.connect();
   fire.subscribe(&fbdo, "state");
 
-  evtManager.subscribe(Subscriber("run", &pumpStartEvent));
-  evtManager.subscribe(Subscriber("stop", &pumpStopEvent));
-  evtManager.subscribe(Subscriber("setSpeed", &pumpSpeedEvent));
+  evtManager.subscribe(Subscriber(EventNames::StartPump, &pumpStartEvent));
+  evtManager.subscribe(Subscriber(EventNames::StopPump, &pumpStopEvent));
+  evtManager.subscribe(Subscriber(EventNames::SetPumpPressure, &pumpSpeedEvent));
+  evtManager.subscribe(Subscriber(EventNames::SetPumpRunDuration, &pumpRunDurationEvent));
+  evtManager.subscribe(Subscriber(EventNames::SetPumpSchedule, &pumpScheduleEvent));
+  evtManager.subscribe(Subscriber(EventNames::ScheduleStart, &schedulePumpStartEvent));
+  evtManager.subscribe(Subscriber(EventNames::ScheduleStop, &schedulePumpStopEvent));
 }
 
 void loop()
@@ -71,4 +96,18 @@ void loop()
 void serverListen()
 {
   httpServer.serverListen();
+}
+
+void eventStartPump()
+{
+  Event event(EventNames::StartPump);
+  evtManager.trigger(event);
+}
+
+void eventStopPump()
+{
+  Event eventStart(EventNames::StopPump);
+  evtManager.trigger(eventStart);
+  Event eventSchedule(EventNames::ScheduleStart);
+  evtManager.trigger(eventSchedule);
 }

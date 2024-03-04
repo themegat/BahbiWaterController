@@ -65,6 +65,11 @@ String NetTime::getMinute()
     return _getFomatted("%M");
 }
 
+String NetTime::getSecond()
+{
+    return _getFomatted("%S");
+}
+
 int NetTime::toNumber(char *value)
 {
     return stoi(value);
@@ -73,12 +78,12 @@ int NetTime::toNumber(char *value)
 String NetTime::getTimeString()
 {
     return getDayOfMonth() + "/" + getMonth() + "/" + getYear() +
-           " " + getHour() + ":" + getMinute();
+           " " + getHour() + ":" + getMinute() + ":" + getSecond();
 }
 
 String NetTime::_getFomatted(char *format)
 {
-
+    getLocalTime(&_timeinfo);
     char time[5];
     strftime(time, 5, format, &_timeinfo);
     return time;

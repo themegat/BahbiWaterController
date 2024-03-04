@@ -1,21 +1,37 @@
 #include "FireInterface.h"
+#include <TaskSchedulerDeclarations.h>
+#include "NetTime.h"
+#include "TimeUtil.h"
+#include <Arduino.h>
+#include <vector>
+#include "FireSubscriptions.h"
+#include <Firebase_ESP_Client.h>
 #include "addons/RTDBHelper.h"
 #include "addons/TokenHelper.h"
-#include "FireSubscriptions.h"
+
+#include "PumpController.h"
 
 FirebaseAuth auth;
 FirebaseConfig config;
 
 bool signupOK = false;
 
-void streamCallback(FirebaseStream data)
+extern Task taskStartMotor;
+extern NetTime netTime;
+
+extern PumpController pumpCtrl;
+
+#pragma region private
+void FireInterface::_streamCallback(FirebaseStream data)
 {
     // Serial.println("Data path: " + data.dataPath());
     // Print out the value
     // Stream data can be many types which can be determined from function dataType
     if (data.dataTypeEnum() == firebase_rtdb_data_type_integer)
     {
-        Serial.println(data.to<int>());
+        // Serial.println(data.to<int>());
+        FireSubscriptions::pumpPressure(data.dataPath(), data.to<int>());
+        FireSubscriptions::runDurationSeconds(data.dataPath(), data.to<int>());
     }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_float)
         Serial.println(data.to<float>(), 5);
@@ -27,21 +43,38 @@ void streamCallback(FirebaseStream data)
     }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_string)
     {
-        FireSubscriptions::pumpPressure(data.dataPath(), data.to<String>());
+        Serial.println("String");
+        Serial.println(data.to<String>());
+        // FireSubscriptions::pumpPressure(data.dataPath(), data.to<String>());
+        // FireSubscriptions::runDurationSeconds(data.dataPath(), data.to<String>());
     }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_json)
     {
         FirebaseJson *json = data.to<FirebaseJson *>();
+
+        FirebaseJsonData scheduleData;
+        json->get(scheduleData, "scheduledRunTimes");
+        FireSubscriptions::pumpSchedule("scheduledRunTimes", scheduleData.to<String>());
+
+        FirebaseJsonData durationData;
+        json->get(durationData, "runDurationSeconds");
+        FireSubscriptions::runDurationSeconds("runDurationSeconds", durationData.to<int>());
+
+        FirebaseJsonData pressureData;
+        json->get(pressureData, "pumpPressure");
+        FireSubscriptions::pumpPressure("pumpPressure", pressureData.to<int>());
+
         Serial.println(json->raw());
     }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_array)
     {
+        Serial.println("Array");
         FirebaseJsonArray *arr = data.to<FirebaseJsonArray *>();
         Serial.println(arr->raw());
     }
 }
 
-void streamTimeoutCallback(bool timeout)
+void FireInterface::_streamTimeoutCallback(bool timeout)
 {
     if (timeout)
     {
@@ -49,7 +82,9 @@ void streamTimeoutCallback(bool timeout)
         Serial.println("Stream timeout, resume streaming...");
     }
 }
+#pragma endregion
 
+#pragma region public
 FireInterface::FireInterface(String apiKey, String databaseUrl, String deviceID)
 {
     _apiKey = apiKey;
@@ -98,7 +133,7 @@ void FireInterface::subscribe(FirebaseData *fbdo, String path)
 {
     String fullPath = "/" + _deviceID + "/" + path;
     Serial.println("Subscribed to " + fullPath);
-    Firebase.RTDB.setStreamCallback(fbdo, streamCallback, streamTimeoutCallback);
+    Firebase.RTDB.setStreamCallback(fbdo, _streamCallback, _streamTimeoutCallback);
 
     // In setup(), set the streaming path to "/test/data" and begin stream connection
 
@@ -108,3 +143,4 @@ void FireInterface::subscribe(FirebaseData *fbdo, String path)
         Serial.println(fbdo->errorReason());
     }
 }
+#pragma endregion
