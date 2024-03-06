@@ -17,6 +17,7 @@ public:
     void setRunDuration(int duration);
     int getRunDuration();
     void setSchedules(std::vector<String> schedules);
+    void setScheduleAtIndex(String schedule, int index);
     std::vector<String> getSchedules();
     String getNextSchedule(String currentTime);
 
@@ -29,6 +30,7 @@ private:
     PumpSpeed _speed;
     int _runDuration;
     std::vector<String> _schedules;
+    void _printSchedules();
 };
 
 #endif
