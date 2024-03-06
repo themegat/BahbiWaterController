@@ -53,13 +53,29 @@ boolean FireSubscriptions::runDurationSeconds(String path, int state)
 
 boolean FireSubscriptions::pumpSchedule(String path, String state)
 {
-    if (path.indexOf("scheduledRunTimes") != -1)
+    String allowedPath = "scheduledRunTimes";
+    if (path.indexOf(allowedPath) != -1)
     {
-        state.replace("[", "");
-        state.replace("]", "");
-        state.replace("\"", "");
-        Event event(EventNames::SetPumpSchedule, state.c_str());
-        evtManager.trigger(event);
+        path.replace(allowedPath, "");
+        if (path.indexOf("/") > -1)
+        {
+            path.replace("/", "");
+            path.replace("/", "");
+            if (path.toInt() && path.toInt() > -1)
+            {
+                state = state + "?" + path.toInt();
+                Event event(EventNames::SetPumpSchedule, state.c_str());
+                evtManager.trigger(event);
+            }
+        }
+        else
+        {
+            state.replace("[", "");
+            state.replace("]", "");
+            state.replace("\"", "");
+            Event event(EventNames::SetPumpSchedule, state.c_str());
+            evtManager.trigger(event);
+        }
 
         return true;
     }

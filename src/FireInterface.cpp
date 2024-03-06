@@ -24,29 +24,28 @@ extern PumpController pumpCtrl;
 #pragma region private
 void FireInterface::_streamCallback(FirebaseStream data)
 {
+    // Print out the path
     // Serial.println("Data path: " + data.dataPath());
-    // Print out the value
-    // Stream data can be many types which can be determined from function dataType
     if (data.dataTypeEnum() == firebase_rtdb_data_type_integer)
     {
-        // Serial.println(data.to<int>());
         FireSubscriptions::pumpPressure(data.dataPath(), data.to<int>());
         FireSubscriptions::runDurationSeconds(data.dataPath(), data.to<int>());
     }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_float)
-        Serial.println(data.to<float>(), 5);
+    {
+        // Serial.println(data.to<float>(), 5);
+    }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_double)
-        printf("%.9lf\n", data.to<double>());
+    {
+        // printf("%.9lf\n", data.to<double>());
+    }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_boolean)
     {
         FireSubscriptions::switchOn(data.dataPath(), data.to<bool>());
     }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_string)
     {
-        Serial.println("String");
-        Serial.println(data.to<String>());
-        // FireSubscriptions::pumpPressure(data.dataPath(), data.to<String>());
-        // FireSubscriptions::runDurationSeconds(data.dataPath(), data.to<String>());
+        FireSubscriptions::pumpSchedule(data.dataPath(), data.to<String>());
     }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_json)
     {
@@ -63,14 +62,12 @@ void FireInterface::_streamCallback(FirebaseStream data)
         FirebaseJsonData pressureData;
         json->get(pressureData, "pumpPressure");
         FireSubscriptions::pumpPressure("pumpPressure", pressureData.to<int>());
-
-        Serial.println(json->raw());
     }
     else if (data.dataTypeEnum() == firebase_rtdb_data_type_array)
     {
-        Serial.println("Array");
-        FirebaseJsonArray *arr = data.to<FirebaseJsonArray *>();
-        Serial.println(arr->raw());
+        // Serial.println("Array");
+        // FirebaseJsonArray *arr = data.to<FirebaseJsonArray *>();
+        // Serial.println(arr->raw());
     }
 }
 
@@ -78,7 +75,6 @@ void FireInterface::_streamTimeoutCallback(bool timeout)
 {
     if (timeout)
     {
-        // Stream timeout occurred
         Serial.println("Stream timeout, resume streaming...");
     }
 }

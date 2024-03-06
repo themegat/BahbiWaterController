@@ -82,10 +82,21 @@ int PumpController::getRunDuration()
 void PumpController::setSchedules(std::vector<String> schedules)
 {
     _schedules = schedules;
-    Serial.println("PumpController - Following schedules added");
-    for (String sc : _schedules)
+    Serial.println("PumpController - Schedules added");
+    _printSchedules();
+}
+
+void PumpController::setScheduleAtIndex(String schedule, int index)
+{
+    if ((_schedules.size() - 1) >= index && index >= 0)
     {
-        Serial.println("Schedule :: " + sc);
+        _schedules[index] = schedule;
+        Serial.println("PumpController - Schedules updated");
+        _printSchedules();
+    }
+    else
+    {
+        Serial.println("PumpController - Index out of bounds: " + index);
     }
 }
 
@@ -115,4 +126,12 @@ String PumpController::getNextSchedule(String currentTime)
         }
     }
     return result;
+}
+
+void PumpController::_printSchedules()
+{
+    for (String sc : _schedules)
+    {
+        Serial.println("Schedule :: " + sc);
+    }
 }
