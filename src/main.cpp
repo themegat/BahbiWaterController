@@ -57,8 +57,8 @@ void eventStopPump();
 
 Scheduler sc;
 
-Task taskStartPump(TASK_ONCE, TASK_ONCE, &eventStartPump);
-Task taskStopPump(TASK_ONCE, TASK_ONCE, &eventStopPump);
+Task taskStartPump(TASK_SCHEDULE_NC, TASK_ONCE, &eventStartPump);
+Task taskStopPump(TASK_SCHEDULE_NC, TASK_ONCE, &eventStopPump);
 
 void setup()
 {
@@ -106,8 +106,8 @@ void eventStartPump()
 
 void eventStopPump()
 {
-  Event eventStart(EventNames::StopPump);
-  evtManager.trigger(eventStart);
+  Event eventStop(EventNames::StopPump);
+  evtManager.trigger(eventStop);
   Event eventSchedule(EventNames::ScheduleStart);
   evtManager.trigger(eventSchedule);
 }

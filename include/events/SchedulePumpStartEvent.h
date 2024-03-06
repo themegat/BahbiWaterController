@@ -39,9 +39,8 @@ void SchedulePumpStartEvent::execute(Event evt)
     Serial.println("Setting schedule at : " + currentTime);
     String nextSchedule = pumpCtrl.getNextSchedule(currentTime);
     int netxRun = TimeUtil::getTimeDifference(currentTime, nextSchedule);
-   
-    taskStartPump.enableDelayed(netxRun);
-    taskStopPump.enableDelayed(netxRun + (pumpCtrl.getRunDuration() * 1000));
+    taskStartPump.restartDelayed(netxRun);
+    taskStopPump.restartDelayed(netxRun + (pumpCtrl.getRunDuration() * 1000));
     Serial.println("SchedulePumpStartEvent:: Next run at " + nextSchedule);
 }
 

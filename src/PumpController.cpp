@@ -14,7 +14,7 @@ PumpController::PumpController(int transistor1, int transistor2, int transistor3
     pinMode(transistor4, OUTPUT);
     _transistor4 = transistor4;
     _speed = PumpSpeed::SMEDIUM;
-    _runDuration = 5;
+    _runDuration = 10;
 }
 
 void PumpController::run(PumpSpeed speed)
