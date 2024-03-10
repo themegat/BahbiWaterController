@@ -30,6 +30,6 @@ Then build and install the project.
 
 ## Schematics
 
-Included in this reposistory, are the schematics for the controller.
+Included in this repository, are the schematics for the controller.
 
 ![alt-text](/docs/schematic/Schematic_Bahbi-Water_2024-03-10.svg?raw=true "Schematic")
