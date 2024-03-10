@@ -38,7 +38,8 @@ void PumpScheduleEvent::execute(Event evt)
     if (data.indexOf("?") >= 0)
     {
         String index = data.substring(data.indexOf("?"));
-        index.replace("?", "");
+        index.replace("?", " ");
+        index.trim();
         data.remove(data.indexOf("?"));
         pumpCtrl.setScheduleAtIndex(data, index.toInt());
     }

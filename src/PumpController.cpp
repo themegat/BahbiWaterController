@@ -88,6 +88,8 @@ void PumpController::setSchedules(std::vector<String> schedules)
 
 void PumpController::setScheduleAtIndex(String schedule, int index)
 {
+    Serial.println("PumpController - Updating schedule " + schedule + " at index " + index);
+
     if ((_schedules.size() - 1) >= index && index >= 0)
     {
         _schedules[index] = schedule;

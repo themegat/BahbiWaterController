@@ -4,6 +4,7 @@
 #include <ESP8266WiFi.h>
 #include <aWOT.h>
 #include "PumpSpeed.h"
+#include "EventNames.h"
 
 extern WiFiServer server;
 extern Application app;
@@ -16,9 +17,8 @@ void index(Request &req, Response &res)
 
 void run(Request &req, Response &res)
 {
-    Event slow("run", "SLOW");
-    Event medium("run", "MEDIUM");
-    Event high("run", "HIGH");
+    Event startPumpEvt(EventNames::StartPump);
+    Event evt(EventNames::SetPumpPressure);
 
     const int charLen = 10;
     char paramSpeed[charLen];
@@ -26,23 +26,34 @@ void run(Request &req, Response &res)
     req.route("speed", paramSpeed, charLen);
     String result = "";
     int speed = atoi(paramSpeed);
-    Serial.println("speed - " + speed);
+    Serial.println("HttpServer run: Speed - " + String(paramSpeed));
     switch (speed)
     {
     case 1:
+    {
         result = pumpSpeedStr(SLOW);
-        evtManager.trigger(slow);
+        evt.extra = paramSpeed;
+        evtManager.trigger(evt);
+        evtManager.trigger(startPumpEvt);
         break;
+    }
     case 2:
+    {
         result = pumpSpeedStr(SHIGH);
-        evtManager.trigger(medium);
+        evt.extra = paramSpeed;
+        evtManager.trigger(evt);
+        evtManager.trigger(startPumpEvt);
         break;
+    }
     case 3:
+    {
         result = pumpSpeedStr(SHIGH);
-        evtManager.trigger(high);
+        evt.extra = paramSpeed;
+        evtManager.trigger(evt);
+        evtManager.trigger(startPumpEvt);
         break;
+    }
     default:
-        // pumpCtrl.stop();
         result = "Pump stopped. Speed not 1 - 3";
         break;
     }
