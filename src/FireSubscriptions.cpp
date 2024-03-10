@@ -56,11 +56,11 @@ boolean FireSubscriptions::pumpSchedule(String path, String state)
     String allowedPath = "scheduledRunTimes";
     if (path.indexOf(allowedPath) != -1)
     {
-        path.replace(allowedPath, "");
+        path.replace(allowedPath, " ");
         if (path.indexOf("/") > -1)
         {
-            path.replace("/", "");
-            path.replace("/", "");
+            path.replace("/", " ");
+            path.trim();
             if (path.toInt() && path.toInt() > -1)
             {
                 state = state + "?" + path.toInt();
