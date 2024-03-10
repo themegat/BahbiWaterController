@@ -28,8 +28,15 @@ Connect a ESP8266 (D1 - Mini) to your development machine.
 Then build and install the project.
 #### That's all ... (You can either use the companion application or something like Postman to *contorl/monitor* the board).
 
+## Architecture
+
+Included in this repository, is the architecture diagram which shows the layout of the firebase realtime database which is required to send remote commands to the controller. 
+
+![alt-text](/docs/architecture/Bahbi-Water.drawio.svg?raw=true "Architecture")
+
 ## Schematics
 
 Included in this repository, are the schematics for the controller.
 
 ![alt-text](/docs/schematic/Schematic_Bahbi-Water_2024-03-10.svg?raw=true "Schematic")
+
