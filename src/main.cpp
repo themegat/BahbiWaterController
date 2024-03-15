@@ -5,11 +5,11 @@
  * @modify date 2024-03-15
  */
 
-
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <aWOT.h>
 #include <TaskSchedulerDeclarations.h>
+#include <ArduinoLog.h>
 
 #include "PumpController.h"
 #include "Configuration.h"
@@ -68,17 +68,16 @@ void firebaseReady();
 #define PERIOD_READY_STATUS 10
 #define DURATION 1000000
 
-String readPath = "/" + String(Configuration::fireDeviceID) + "/state";
-
 Task taskRead(PERIOD_READ *TASK_SECOND, (DURATION / 10) / PERIOD_READ, &readFromFire, &runner, true);
 Task taskFirebaseReady(PERIOD_READY_STATUS *TASK_MINUTE, DURATION / PERIOD_READY_STATUS, &firebaseReady, &runner, true);
-FireInterface fire(Configuration::fireApiKey,
-                   Configuration::fireDatabaseUrl, readPath,
-                   Configuration::fireUserEmail, Configuration::fireUserPassword);
+FireInterface fire;
 
 void setup()
 {
   Serial.begin(9600);
+  Log.begin(LOG_LEVEL_ERROR, &Serial);
+
+  Serial.println();
   Serial.println("Setting up ...");
 
   httpServer.start();

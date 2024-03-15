@@ -21,7 +21,7 @@ class FireInterface{
         void _processJson();
     
     public:
-        FireInterface(String apiKey, String dbUrl, String readPath, String userEmail, String userPassword);
+        FireInterface();
         void connect();
         void ready();
         void read();

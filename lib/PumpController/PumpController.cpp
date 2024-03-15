@@ -5,11 +5,11 @@
  * @modify date 2024-03-15
  */
 
-
 #include "PumpController.h"
 #include <Arduino.h>
 #include "PumpSpeed.h"
 #include "TimeUtil.h"
+#include "ArduinoLog.h"
 
 PumpController::PumpController(int transistor1, int transistor2, int transistor3, int transistor4)
 {
@@ -52,7 +52,7 @@ void PumpController::run(PumpSpeed speed)
         digitalWrite(_transistor4, HIGH);
     }
     _running = true;
-    Serial.println("PumpController - Running at : " + pumpSpeedStr(_speed));
+    Log.info("PumpController - Running at : %s" CR, pumpSpeedStr(_speed).c_str());
 }
 
 void PumpController::stop()
@@ -62,13 +62,13 @@ void PumpController::stop()
     digitalWrite(_transistor3, LOW);
     digitalWrite(_transistor4, LOW);
     _running = false;
-    Serial.println("PumpController - Stopped");
+    Log.info("PumpController - Stopped");
 }
 
 void PumpController::setSpeed(PumpSpeed speed)
 {
     _speed = speed;
-    Serial.println("PumpController - Speed set to : " + pumpSpeedStr(_speed));
+    Log.info("PumpController - Speed set to : %s"CR, pumpSpeedStr(_speed).c_str());
 }
 
 PumpSpeed PumpController::getSpeed()
@@ -79,7 +79,7 @@ PumpSpeed PumpController::getSpeed()
 void PumpController::setRunDuration(int duration)
 {
     _runDuration = duration;
-    Serial.println("PumpController - Run duration set to : " + String(duration));
+    Log.info("PumpController - Run duration set to : %s" CR, String(duration).c_str());
 }
 
 int PumpController::getRunDuration()
@@ -90,23 +90,25 @@ int PumpController::getRunDuration()
 void PumpController::setSchedules(std::vector<String> schedules)
 {
     _schedules = schedules;
-    Serial.println("PumpController - Schedules added");
+    Log.info("PumpController - Schedules added");
     _printSchedules();
 }
 
 void PumpController::setScheduleAtIndex(String schedule, int index)
 {
-    Serial.println("PumpController - Updating schedule " + schedule + " at index " + index);
+    String msg = "PumpController - Updating schedule " + schedule + " at index " + index;
+    Log.info(msg.c_str());
 
     if ((_schedules.size() - 1) >= index && index >= 0)
     {
         _schedules[index] = schedule;
-        Serial.println("PumpController - Schedules updated");
+        Log.info("PumpController - Schedules updated");
         _printSchedules();
     }
     else
     {
-        Serial.println("PumpController - Index out of bounds: " + index);
+        msg = "PumpController - Index out of bounds: " + index;
+        Log.error(msg.c_str());
     }
 }
 
@@ -142,6 +144,6 @@ void PumpController::_printSchedules()
 {
     for (String sc : _schedules)
     {
-        Serial.println("Schedule :: " + sc);
+        Log.info("Schedule :: %s"CR, sc.c_str());
     }
 }

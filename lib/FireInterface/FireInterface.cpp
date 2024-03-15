@@ -10,19 +10,21 @@
 #include <addons/TokenHelper.h>
 #include <addons/RTDBHelper.h>
 #include <FireSubscriptions.h>
+#include <Configuration.h>
+#include <ArduinoLog.h>
 
 FirebaseData fbdo;
 
 FirebaseAuth auth;
 FirebaseConfig config;
 
-FireInterface::FireInterface(String apiKey, String dbUrl, String readPath, String userEmail, String userPassword)
+FireInterface::FireInterface()
 {
-    _apiKey = apiKey;
-    _dbUrl = dbUrl;
-    _readPath = readPath;
-    _userEmail = userEmail;
-    _userPassword = userPassword;
+    _apiKey = Configuration::fireApiKey;
+    _dbUrl = Configuration::fireDatabaseUrl;
+    _readPath = "/" + String(Configuration::fireDeviceID) + "/state";
+    _userEmail = Configuration::fireUserEmail;
+    _userPassword = Configuration::fireUserPassword;
     _cachedRead = "";
 }
 
@@ -30,7 +32,6 @@ FireInterface::FireInterface(String apiKey, String dbUrl, String readPath, Strin
 
 void FireInterface::connect()
 {
-    delay(1000);
     config.api_key = _apiKey;
     config.database_url = _dbUrl;
     auth.user.email = _userEmail;
@@ -39,14 +40,14 @@ void FireInterface::connect()
     Serial.println("Firebase connecting");
     Firebase.begin(&config, &auth);
     Firebase.reconnectWiFi(true);
-    Serial.println("Firebase connected");
+    Serial.println("Firebase connected as {" + _userEmail + "}");
 }
 
 void FireInterface::ready()
 {
     if (!Firebase.ready())
     {
-        Serial.println("Firebase not ready");
+        Log.error("Firebase not ready");
     }
 }
 
@@ -64,7 +65,7 @@ void FireInterface::read()
         }
         else
         {
-            Serial.println(fbdo.errorReason());
+            Log.error("FireInterface Error: %s"CR, fbdo.errorReason().c_str());
         }
     }
 }
@@ -94,8 +95,7 @@ void FireInterface::_processJson()
         json->get(pressureData, "pumpPressure");
         FireSubscriptions::pumpPressure("pumpPressure", pressureData.to<String>());
 
-        Serial.println("JSON Processed: ");
-        Serial.println(_cachedRead);
+        Log.verbose("JSON Processed: %s"CR, _cachedRead.c_str());
     }
 }
 
