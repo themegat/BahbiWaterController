@@ -10,19 +10,20 @@
 #include <addons/TokenHelper.h>
 #include <addons/RTDBHelper.h>
 #include <FireSubscriptions.h>
+#include <Configuration.h>
 
 FirebaseData fbdo;
 
 FirebaseAuth auth;
 FirebaseConfig config;
 
-FireInterface::FireInterface(String apiKey, String dbUrl, String readPath, String userEmail, String userPassword)
+FireInterface::FireInterface()
 {
-    _apiKey = apiKey;
-    _dbUrl = dbUrl;
-    _readPath = readPath;
-    _userEmail = userEmail;
-    _userPassword = userPassword;
+    _apiKey = Configuration::fireApiKey;
+    _dbUrl = Configuration::fireDatabaseUrl;
+    _readPath = "/" + String(Configuration::fireDeviceID) + "/state";
+    _userEmail = Configuration::fireUserEmail;
+    _userPassword = Configuration::fireUserPassword;
     _cachedRead = "";
 }
 
@@ -39,7 +40,7 @@ void FireInterface::connect()
     Serial.println("Firebase connecting");
     Firebase.begin(&config, &auth);
     Firebase.reconnectWiFi(true);
-    Serial.println("Firebase connected");
+    Serial.println("Firebase connected as {" + _userEmail + "}");
 }
 
 void FireInterface::ready()

@@ -68,13 +68,9 @@ void firebaseReady();
 #define PERIOD_READY_STATUS 10
 #define DURATION 1000000
 
-String readPath = "/" + String(Configuration::fireDeviceID) + "/state";
-
 Task taskRead(PERIOD_READ *TASK_SECOND, (DURATION / 10) / PERIOD_READ, &readFromFire, &runner, true);
 Task taskFirebaseReady(PERIOD_READY_STATUS *TASK_MINUTE, DURATION / PERIOD_READY_STATUS, &firebaseReady, &runner, true);
-FireInterface fire(Configuration::fireApiKey,
-                   Configuration::fireDatabaseUrl, readPath,
-                   Configuration::fireUserEmail, Configuration::fireUserPassword);
+FireInterface fire;
 
 void setup()
 {
