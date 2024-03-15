@@ -1,3 +1,11 @@
+/**
+ * @author T Motsoeneng
+ * @email tshepomotsoeneng0@gmail.com
+ * @create date 2024-03-15
+ * @modify date 2024-03-15
+ */
+
+
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <aWOT.h>
@@ -8,17 +16,15 @@
 #include "PumpSpeed.h"
 #include "HttpServer.h"
 #include "Event.h"
-#include "FireInterface.h"
-#include <Firebase_ESP_Client.h>
+#include <FireInterface.h>
 
-#include "events/PumpStartEvent.h"
-#include "events/PumpStopEvent.h"
-#include "events/PumpSpeedEvent.h"
-#include "events/PumpRunDurationEvent.h"
-#include "events/PumpScheduleEvent.h"
-#include "events/SchedulePumpStartEvent.h"
-#include "events/SchedulePumpStopEvent.h"
-
+#include "PumpStartEvent.h"
+#include "PumpStopEvent.h"
+#include "PumpSpeedEvent.h"
+#include "PumpRunDurationEvent.h"
+#include "PumpScheduleEvent.h"
+#include "SchedulePumpStartEvent.h"
+#include "SchedulePumpStopEvent.h"
 
 #include "EventNames.h"
 
@@ -34,8 +40,6 @@ Application app;
 HttpServer httpServer(Configuration::wifiSSID, Configuration::wifiPassword);
 void serverListen();
 
-Task taskServer(1, TASK_FOREVER, &serverListen);
-
 Scheduler runner;
 EventManager evtManager;
 
@@ -47,36 +51,40 @@ PumpScheduleEvent pumpScheduleEvent;
 SchedulePumpStartEvent schedulePumpStartEvent;
 SchedulePumpStopEvent schedulePumpStopEvent;
 
-FirebaseData fbdo;
-FireInterface fire(Configuration::fireApiKey, Configuration::fireDatabaseUrl, Configuration::fireDeviceID);
-
 NetTime netTime(Configuration::timeZone, 0, Configuration::ntpServer);
 
 void eventStartPump();
 void eventStopPump();
 
-Scheduler sc;
+Task taskServer(1, TASK_FOREVER, &serverListen, &runner, true);
+Task taskStartPump(TASK_SCHEDULE_NC, TASK_ONCE, &eventStartPump, &runner, false);
+Task taskStopPump(TASK_SCHEDULE_NC, TASK_ONCE, &eventStopPump, &runner, false);
 
-Task taskStartPump(TASK_SCHEDULE_NC, TASK_ONCE, &eventStartPump);
-Task taskStopPump(TASK_SCHEDULE_NC, TASK_ONCE, &eventStopPump);
+void readFromFire();
+void connectWifi();
+void firebaseReady();
+
+#define PERIOD_READ 30
+#define PERIOD_READY_STATUS 10
+#define DURATION 1000000
+
+String readPath = "/" + String(Configuration::fireDeviceID) + "/state";
+
+Task taskRead(PERIOD_READ *TASK_SECOND, (DURATION / 10) / PERIOD_READ, &readFromFire, &runner, true);
+Task taskFirebaseReady(PERIOD_READY_STATUS *TASK_MINUTE, DURATION / PERIOD_READY_STATUS, &firebaseReady, &runner, true);
+FireInterface fire(Configuration::fireApiKey,
+                   Configuration::fireDatabaseUrl, readPath,
+                   Configuration::fireUserEmail, Configuration::fireUserPassword);
 
 void setup()
 {
   Serial.begin(9600);
   Serial.println("Setting up ...");
 
-  runner.init();
-  runner.addTask(taskServer);
-  runner.addTask(taskStartPump);
-  runner.addTask(taskStopPump);
-
   httpServer.start();
   netTime.init();
 
-  taskServer.enable();
-
   fire.connect();
-  fire.subscribe(&fbdo, "state");
 
   evtManager.subscribe(Subscriber(EventNames::StartPump, &pumpStartEvent));
   evtManager.subscribe(Subscriber(EventNames::StopPump, &pumpStopEvent));
@@ -89,7 +97,6 @@ void setup()
 
 void loop()
 {
-  fire.start();
   runner.execute();
 }
 
@@ -110,4 +117,14 @@ void eventStopPump()
   evtManager.trigger(eventStop);
   Event eventSchedule(EventNames::ScheduleStart);
   evtManager.trigger(eventSchedule);
+}
+
+void readFromFire()
+{
+  fire.read();
+}
+
+void firebaseReady()
+{
+  fire.ready();
 }
