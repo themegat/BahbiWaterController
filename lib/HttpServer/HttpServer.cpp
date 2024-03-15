@@ -14,6 +14,7 @@
 #include <aWOT.h>
 #include "PumpSpeed.h"
 #include "EventNames.h"
+#include <ArduinoLog.h>
 
 extern WiFiServer server;
 extern Application app;
@@ -35,7 +36,7 @@ void run(Request &req, Response &res)
     req.route("speed", paramSpeed, charLen);
     String result = "";
     int speed = atoi(paramSpeed);
-    Serial.println("HttpServer run: Speed - " + String(paramSpeed));
+    Log.info("HttpServer run: Speed - %s"CR, String(paramSpeed).c_str());
     switch (speed)
     {
     case 1:

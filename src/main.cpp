@@ -5,11 +5,11 @@
  * @modify date 2024-03-15
  */
 
-
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <aWOT.h>
 #include <TaskSchedulerDeclarations.h>
+#include <ArduinoLog.h>
 
 #include "PumpController.h"
 #include "Configuration.h"
@@ -75,6 +75,9 @@ FireInterface fire;
 void setup()
 {
   Serial.begin(9600);
+  Log.begin(LOG_LEVEL_ERROR, &Serial);
+
+  Serial.println();
   Serial.println("Setting up ...");
 
   httpServer.start();

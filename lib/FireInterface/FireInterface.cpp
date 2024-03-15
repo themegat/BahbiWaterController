@@ -11,6 +11,7 @@
 #include <addons/RTDBHelper.h>
 #include <FireSubscriptions.h>
 #include <Configuration.h>
+#include <ArduinoLog.h>
 
 FirebaseData fbdo;
 
@@ -31,7 +32,6 @@ FireInterface::FireInterface()
 
 void FireInterface::connect()
 {
-    delay(1000);
     config.api_key = _apiKey;
     config.database_url = _dbUrl;
     auth.user.email = _userEmail;
@@ -47,7 +47,7 @@ void FireInterface::ready()
 {
     if (!Firebase.ready())
     {
-        Serial.println("Firebase not ready");
+        Log.error("Firebase not ready");
     }
 }
 
@@ -65,7 +65,7 @@ void FireInterface::read()
         }
         else
         {
-            Serial.println(fbdo.errorReason());
+            Log.error("FireInterface Error: %s"CR, fbdo.errorReason().c_str());
         }
     }
 }
@@ -95,8 +95,7 @@ void FireInterface::_processJson()
         json->get(pressureData, "pumpPressure");
         FireSubscriptions::pumpPressure("pumpPressure", pressureData.to<String>());
 
-        Serial.println("JSON Processed: ");
-        Serial.println(_cachedRead);
+        Log.verbose("JSON Processed: %s"CR, _cachedRead.c_str());
     }
 }
 

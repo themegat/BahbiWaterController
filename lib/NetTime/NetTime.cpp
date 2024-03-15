@@ -7,6 +7,8 @@
 
 
 #include "NetTime.h"
+#include "ArduinoLog.h"
+
 using namespace std;
 
 NetTime::NetTime(long timeZone, int dayLightOffset, String ntpServer)
@@ -43,8 +45,7 @@ void NetTime::init()
 
     if (!timeInfoSet)
     {
-        Serial.println();
-        Serial.println("Failed to set time information");
+        Log.error("Failed to set time information");
     }
 }
 

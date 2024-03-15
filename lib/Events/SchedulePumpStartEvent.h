@@ -6,6 +6,7 @@
 #include "EventNames.h"
 #include <TaskSchedulerDeclarations.h>
 #include "TimeUtil.h"
+#include <ArduinoLog.h>
 
 #ifndef SchedulePumpStartEvent_h
 #define SchedulePumpStartEvent_h
@@ -36,12 +37,12 @@ SchedulePumpStartEvent::SchedulePumpStartEvent()
 void SchedulePumpStartEvent::execute(Event evt)
 {
     String currentTime = netTime.getHour() + ":" + netTime.getMinute() + ":" + netTime.getSecond();
-    Serial.println("Setting schedule at : " + currentTime);
+    Log.info("Setting schedule at : %s"CR, currentTime.c_str());
     String nextSchedule = pumpCtrl.getNextSchedule(currentTime);
     int netxRun = TimeUtil::getTimeDifference(currentTime, nextSchedule);
     taskStartPump.restartDelayed(netxRun);
     taskStopPump.restartDelayed(netxRun + (pumpCtrl.getRunDuration() * 1000));
-    Serial.println("SchedulePumpStartEvent:: Next run at " + nextSchedule);
+    Log.info("SchedulePumpStartEvent:: Next run at %s"CR, nextSchedule);
 }
 
 #endif
