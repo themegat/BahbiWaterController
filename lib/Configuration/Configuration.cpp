@@ -1,3 +1,11 @@
+/**
+ * @author T Motsoeneng
+ * @email tshepomotsoeneng0@gmail.com
+ * @create date 2024-03-15
+ * @modify date 2024-03-15
+ */
+
+
 #include "Configuration.h"
 #include <Arduino.h>
 #include <string>
@@ -9,3 +17,5 @@ char Configuration::fireDatabaseUrl[100] = "";
 char Configuration::fireDeviceID[30] = "";
 long Configuration::timeZone = 2;
 char Configuration::ntpServer[30] = "pool.ntp.org";
+char Configuration::fireUserEmail[50] = "";
+char Configuration::fireUserPassword[30] = "";
