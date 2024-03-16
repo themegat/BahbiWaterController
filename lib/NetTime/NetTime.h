@@ -24,6 +24,8 @@ public:
     String getHour();
     String getMinute();
     String getSecond();
+    String getDateTimeString();
+    String getDateString();
     String getTimeString();
     int toNumber(char *value);
 

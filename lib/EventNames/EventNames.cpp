@@ -14,6 +14,7 @@ char *EventNames::StopPump = "stop";
 char *EventNames::SetPumpPressure = "pressure-set";
 char *EventNames::SetPumpSchedule = "schedule-set";
 char *EventNames::ScheduleStart = "schedule-start";
-char *EventNames::ScheduleStop = "schedule-stop";
+char *EventNames::LogSartUpEvent = "log-startup";
+char *EventNames::LogPumpRunEvent = "log-pump-run";
 
 

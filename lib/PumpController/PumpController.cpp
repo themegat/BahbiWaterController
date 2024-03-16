@@ -10,6 +10,7 @@
 #include "PumpSpeed.h"
 #include "TimeUtil.h"
 #include "ArduinoLog.h"
+#include <EventNames.h>
 
 PumpController::PumpController(int transistor1, int transistor2, int transistor3, int transistor4)
 {
@@ -52,6 +53,8 @@ void PumpController::run(PumpSpeed speed)
         digitalWrite(_transistor4, HIGH);
     }
     _running = true;
+    _startDateTime = netTime.getDateTimeString();
+
     Log.info("PumpController - Running at : %s" CR, pumpSpeedStr(_speed).c_str());
 }
 
@@ -61,14 +64,23 @@ void PumpController::stop()
     digitalWrite(_transistor2, LOW);
     digitalWrite(_transistor3, LOW);
     digitalWrite(_transistor4, LOW);
+
+    if (_running)
+    {
+        Event event(EventNames::LogPumpRunEvent);
+        evtManager.trigger(event);
+    }
+
     _running = false;
+    _stopDateTime = netTime.getDateTimeString();
+
     Log.info("PumpController - Stopped");
 }
 
 void PumpController::setSpeed(PumpSpeed speed)
 {
     _speed = speed;
-    Log.info("PumpController - Speed set to : %s"CR, pumpSpeedStr(_speed).c_str());
+    Log.info("PumpController - Speed set to : %s" CR, pumpSpeedStr(_speed).c_str());
 }
 
 PumpSpeed PumpController::getSpeed()
@@ -140,10 +152,20 @@ String PumpController::getNextSchedule(String currentTime)
     return result;
 }
 
+String PumpController::getStartDateTime()
+{
+    return _startDateTime;
+}
+
+String PumpController::getStopDateTime()
+{
+    return _stopDateTime;
+}
+
 void PumpController::_printSchedules()
 {
     for (String sc : _schedules)
     {
-        Log.info("Schedule :: %s"CR, sc.c_str());
+        Log.info("Schedule :: %s" CR, sc.c_str());
     }
 }

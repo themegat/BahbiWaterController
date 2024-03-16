@@ -17,7 +17,8 @@ class EventNames {
         static char *SetPumpPressure;
         static char *SetPumpSchedule;
         static char *ScheduleStart;
-        static char *ScheduleStop;
+        static char *LogSartUpEvent;
+        static char *LogPumpRunEvent;
 };
 
 #endif

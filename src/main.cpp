@@ -24,7 +24,8 @@
 #include "PumpRunDurationEvent.h"
 #include "PumpScheduleEvent.h"
 #include "SchedulePumpStartEvent.h"
-#include "SchedulePumpStopEvent.h"
+#include "LogSartUpEvent.h"
+#include "LogPumpRunEvent.h"
 
 #include "EventNames.h"
 
@@ -49,7 +50,8 @@ PumpSpeedEvent pumpSpeedEvent;
 PumpRunDurationEvent pumpRunDurationEvent;
 PumpScheduleEvent pumpScheduleEvent;
 SchedulePumpStartEvent schedulePumpStartEvent;
-SchedulePumpStopEvent schedulePumpStopEvent;
+LogSartUpEvent logSartUpEvent;
+LogPumpRunEvent logPumpRunEvent;
 
 NetTime netTime(Configuration::timeZone, 0, Configuration::ntpServer);
 
@@ -59,6 +61,7 @@ void eventStopPump();
 Task taskServer(1, TASK_FOREVER, &serverListen, &runner, true);
 Task taskStartPump(TASK_SCHEDULE_NC, TASK_ONCE, &eventStartPump, &runner, false);
 Task taskStopPump(TASK_SCHEDULE_NC, TASK_ONCE, &eventStopPump, &runner, false);
+Task taskLogPumpRuns(TASK_SCHEDULE_NC, TASK_ONCE, NULL, &runner, false);
 
 void readFromFire();
 void connectWifi();
@@ -91,7 +94,11 @@ void setup()
   evtManager.subscribe(Subscriber(EventNames::SetPumpRunDuration, &pumpRunDurationEvent));
   evtManager.subscribe(Subscriber(EventNames::SetPumpSchedule, &pumpScheduleEvent));
   evtManager.subscribe(Subscriber(EventNames::ScheduleStart, &schedulePumpStartEvent));
-  evtManager.subscribe(Subscriber(EventNames::ScheduleStop, &schedulePumpStopEvent));
+  evtManager.subscribe(Subscriber(EventNames::LogSartUpEvent, &logSartUpEvent));
+  evtManager.subscribe(Subscriber(EventNames::LogPumpRunEvent, &logPumpRunEvent));
+
+  Event event(EventNames::LogSartUpEvent);
+  evtManager.trigger(event);
 }
 
 void loop()
