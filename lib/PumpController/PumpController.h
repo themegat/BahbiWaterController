@@ -9,9 +9,14 @@
 #include "PumpSpeed.h"
 #include <vector>
 #include <Arduino.h>
+#include <NetTime.h>
+#include "Event.h"
 
 #ifndef PumpController_h
 #define PumpController_h
+
+extern NetTime netTime;
+extern EventManager evtManager;
 
 class PumpController
 {
@@ -27,6 +32,8 @@ public:
     void setScheduleAtIndex(String schedule, int index);
     std::vector<String> getSchedules();
     String getNextSchedule(String currentTime);
+    String getStartDateTime();
+    String getStopDateTime();
 
 private:
     int _transistor1;
@@ -38,6 +45,8 @@ private:
     int _runDuration;
     std::vector<String> _schedules;
     void _printSchedules();
+    String _startDateTime;
+    String _stopDateTime;
 };
 
 #endif

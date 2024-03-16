@@ -73,16 +73,16 @@ void FireInterface::read()
 
 void FireInterface::append(String node, String key, std::vector<FireMap> payload)
 {
-    std::vector<String> schedules;
-
     if (Firebase.ready())
     {
         FirebaseJson dto;
         FirebaseJson json;
+        
         for (FireMap item : payload)
         {
             json.add(item.key, item.value);
         }
+
         dto.add(key, json);
         String path = _writePath + "/" + node;
         if (Firebase.RTDB.updateNode(&fbdo, path, &dto))
