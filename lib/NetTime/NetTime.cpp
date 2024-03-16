@@ -38,7 +38,7 @@ void NetTime::init()
         {
             count = countRetry;
             Serial.println();
-            Serial.println("The time is - " + getTimeString());
+            Serial.println("The time is - " + getDateTimeString());
             timeInfoSet = true;
         }
     } while (count < countRetry);
@@ -84,10 +84,20 @@ int NetTime::toNumber(char *value)
     return stoi(value);
 }
 
+String NetTime::getDateTimeString()
+{
+    return getDayOfMonth() + "-" + getMonth() + "-" + getYear() +
+           " " + getHour() + ":" + getMinute() + ":" + getSecond();
+}
+
+String NetTime::getDateString()
+{
+    return getDayOfMonth() + "-" + getMonth() + "-" + getYear();
+}
+
 String NetTime::getTimeString()
 {
-    return getDayOfMonth() + "/" + getMonth() + "/" + getYear() +
-           " " + getHour() + ":" + getMinute() + ":" + getSecond();
+    return getHour() + ":" + getMinute() + ":" + getSecond();
 }
 
 String NetTime::_getFomatted(char *format)

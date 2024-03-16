@@ -23,6 +23,7 @@ FireInterface::FireInterface()
     _apiKey = Configuration::fireApiKey;
     _dbUrl = Configuration::fireDatabaseUrl;
     _readPath = "/" + String(Configuration::fireDeviceID) + "/state";
+    _writePath = "/" + String(Configuration::fireDeviceID) + "/data";
     _userEmail = Configuration::fireUserEmail;
     _userPassword = Configuration::fireUserPassword;
     _cachedRead = "";
@@ -65,7 +66,33 @@ void FireInterface::read()
         }
         else
         {
-            Log.error("FireInterface Error: %s"CR, fbdo.errorReason().c_str());
+            Log.error("FireInterface Error: %s" CR, fbdo.errorReason().c_str());
+        }
+    }
+}
+
+void FireInterface::append(String node, String key, std::vector<FireMap> payload)
+{
+    std::vector<String> schedules;
+
+    if (Firebase.ready())
+    {
+        FirebaseJson dto;
+        FirebaseJson json;
+        for (FireMap item : payload)
+        {
+            json.add(item.key, item.value);
+        }
+        dto.add(key, json);
+        String path = _writePath + "/" + node;
+        if (Firebase.RTDB.updateNode(&fbdo, path, &dto))
+        {
+            Log.info("Updated: %s" CR, fbdo.dataPath().c_str());
+            Log.info("Update payload: %s" CR, fbdo.jsonString().c_str());
+        }
+        else
+        {
+            Log.error("FireInterface Error: %s" CR, fbdo.errorReason().c_str());
         }
     }
 }
@@ -86,7 +113,7 @@ void FireInterface::_processJson()
         FirebaseJsonData scheduleData;
         json->get(scheduleData, "scheduledRunTimes");
         FireSubscriptions::pumpSchedule("scheduledRunTimes", scheduleData.to<String>());
-        
+
         FirebaseJsonData durationData;
         json->get(durationData, "runDurationSeconds");
         FireSubscriptions::runDurationSeconds("runDurationSeconds", durationData.to<String>());
@@ -95,7 +122,7 @@ void FireInterface::_processJson()
         json->get(pressureData, "pumpPressure");
         FireSubscriptions::pumpPressure("pumpPressure", pressureData.to<String>());
 
-        Log.verbose("JSON Processed: %s"CR, _cachedRead.c_str());
+        Log.verbose("JSON Processed: %s" CR, _cachedRead.c_str());
     }
 }
 

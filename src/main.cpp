@@ -24,7 +24,7 @@
 #include "PumpRunDurationEvent.h"
 #include "PumpScheduleEvent.h"
 #include "SchedulePumpStartEvent.h"
-#include "SchedulePumpStopEvent.h"
+#include "LogSartUpEvent.h"
 
 #include "EventNames.h"
 
@@ -49,7 +49,7 @@ PumpSpeedEvent pumpSpeedEvent;
 PumpRunDurationEvent pumpRunDurationEvent;
 PumpScheduleEvent pumpScheduleEvent;
 SchedulePumpStartEvent schedulePumpStartEvent;
-SchedulePumpStopEvent schedulePumpStopEvent;
+LogSartUpEvent logSartUpEvent;
 
 NetTime netTime(Configuration::timeZone, 0, Configuration::ntpServer);
 
@@ -75,7 +75,7 @@ FireInterface fire;
 void setup()
 {
   Serial.begin(9600);
-  Log.begin(LOG_LEVEL_ERROR, &Serial);
+  Log.begin(LOG_LEVEL_VERBOSE, &Serial);
 
   Serial.println();
   Serial.println("Setting up ...");
@@ -91,7 +91,10 @@ void setup()
   evtManager.subscribe(Subscriber(EventNames::SetPumpRunDuration, &pumpRunDurationEvent));
   evtManager.subscribe(Subscriber(EventNames::SetPumpSchedule, &pumpScheduleEvent));
   evtManager.subscribe(Subscriber(EventNames::ScheduleStart, &schedulePumpStartEvent));
-  evtManager.subscribe(Subscriber(EventNames::ScheduleStop, &schedulePumpStopEvent));
+  evtManager.subscribe(Subscriber(EventNames::LogSartUpEvent, &logSartUpEvent));
+
+  Event event(EventNames::LogSartUpEvent);
+  evtManager.trigger(event);
 }
 
 void loop()
