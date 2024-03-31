@@ -35,6 +35,10 @@ public:
     void ready();
     void read();
     void append(String node, String key, std::vector<FireStringMap> payload);
+
+    static inline String RUN_INFO_PATH = "runInfo";
+    static inline String SLEEP_INFO_PATH = "sleepInfo";
+    static inline String WAKE_INFO_PATH = "wakeInfo";
 };
 
 #endif

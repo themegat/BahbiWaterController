@@ -47,7 +47,7 @@ void doSleep()
     String key = netTime.getTimeString();
     String date = netTime.getDateString();
 
-    fire.append("sleepSchedule/" + date, key, payload);
+    fire.append(FireInterface::SLEEP_INFO_PATH + "/" + date, key, payload);
 
     uint64 maxSleep = 40 * TimeUtil::SECONDS * TimeUtil::MICROSECONDS;
     uint64 wakeTimeMicros = wakeAt * TimeUtil::MILLISECONDS;

@@ -45,7 +45,7 @@ void logData()
     String key = netTime.getTimeString();
     String date = netTime.getDateString();
 
-    fire.append("runs/" + date, key, payload);
+    fire.append(FireInterface::RUN_INFO_PATH + "/" + date, key, payload);
 }
 
 class LogPumpRunEvent : public EventTask

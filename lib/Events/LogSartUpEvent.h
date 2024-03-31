@@ -53,7 +53,7 @@ void LogSartUpEvent::execute(Event evt)
     String date = netTime.getDateString();
     String key = netTime.getTimeString();
 
-    fire.append("dateTimeOn/" + date, key, payload);
+    fire.append(FireInterface::WAKE_INFO_PATH + "/" + date, key, payload);
 }
 
 #endif
