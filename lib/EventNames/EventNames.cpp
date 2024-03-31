@@ -1,8 +1,6 @@
 /**
  * @author T Motsoeneng
  * @email tshepomotsoeneng0@gmail.com
- * @create date 2024-03-15
- * @modify date 2024-03-15
  */
 
 
@@ -16,5 +14,6 @@ char *EventNames::SetPumpSchedule = "schedule-set";
 char *EventNames::ScheduleStart = "schedule-start";
 char *EventNames::LogSartUpEvent = "log-startup";
 char *EventNames::LogPumpRunEvent = "log-pump-run";
+char *EventNames::ScheduleSleepEvent = "schedule-sleep";
 
 

@@ -1,8 +1,6 @@
 /**
  * @author T Motsoeneng
  * @email tshepomotsoeneng0@gmail.com
- * @create date 2024-03-15
- * @modify date 2024-03-15
  */
 
 #include <Arduino.h>
@@ -15,7 +13,7 @@ typedef struct
 {
     String key;
     String value;
-} FireMap;
+} FireStringMap;
 
 class FirebaseJson;
 
@@ -36,7 +34,7 @@ public:
     void connect();
     void ready();
     void read();
-    void append(String node, String key, std::vector<FireMap> payload);
+    void append(String node, String key, std::vector<FireStringMap> payload);
 };
 
 #endif

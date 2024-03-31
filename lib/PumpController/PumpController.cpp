@@ -164,6 +164,7 @@ String PumpController::getStopDateTime()
 
 void PumpController::_printSchedules()
 {
+    Log.infoln("");
     for (String sc : _schedules)
     {
         Log.info("Schedule :: %s" CR, sc.c_str());

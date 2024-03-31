@@ -1,10 +1,7 @@
 /**
  * @author T Motsoeneng
  * @email tshepomotsoeneng0@gmail.com
- * @create date 2024-03-16
- * @modify date 2024-03-16
  */
-
 
 #include <Arduino.h>
 #include "Event.h"
@@ -26,9 +23,9 @@ extern Task taskLogPumpRuns;
 
 void logData()
 {
-    std::vector<FireMap> payload;
+    std::vector<FireStringMap> payload;
 
-    FireMap item;
+    FireStringMap item;
     item.key = "startDateTime";
     item.value = pumpCtrl.getStartDateTime();
     payload.push_back(item);
@@ -45,9 +42,10 @@ void logData()
     item.value = pumpSpeedStr(pumpCtrl.getSpeed());
     payload.push_back(item);
 
-    String key = "D" + netTime.getDateString() + "T" + netTime.getTimeString();
-
-    fire.append("runs", key, payload);
+    String key = netTime.getTimeString();
+    String date = netTime.getDateString();
+    
+    fire.append("runs/" + date, key, payload);
 }
 
 class LogPumpRunEvent : public EventTask

@@ -1,8 +1,6 @@
 /**
  * @author T Motsoeneng
  * @email tshepomotsoeneng0@gmail.com
- * @create date 2024-03-15
- * @modify date 2024-03-15
  */
 
 #include "FireInterface.h"
@@ -71,14 +69,14 @@ void FireInterface::read()
     }
 }
 
-void FireInterface::append(String node, String key, std::vector<FireMap> payload)
+void FireInterface::append(String node, String key, std::vector<FireStringMap> payload)
 {
     if (Firebase.ready())
     {
         FirebaseJson dto;
         FirebaseJson json;
-        
-        for (FireMap item : payload)
+
+        for (FireStringMap item : payload)
         {
             json.add(item.key, item.value);
         }
@@ -121,6 +119,13 @@ void FireInterface::_processJson()
         FirebaseJsonData pressureData;
         json->get(pressureData, "pumpPressure");
         FireSubscriptions::pumpPressure("pumpPressure", pressureData.to<String>());
+
+        FirebaseJsonData sleepAt;
+        json->get(sleepAt, "sleepAt");
+        FirebaseJsonData wakeAt;
+        json->get(wakeAt, "wakeAt");
+        String state = sleepAt.to<String>() + "-" + wakeAt.to<String>();
+        FireSubscriptions::scheduleSleep("scheduleSleep", state);
 
         Log.verbose("JSON Processed: %s" CR, _cachedRead.c_str());
     }

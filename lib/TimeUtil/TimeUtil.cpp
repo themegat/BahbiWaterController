@@ -1,18 +1,16 @@
 /**
  * @author T Motsoeneng
  * @email tshepomotsoeneng0@gmail.com
- * @create date 2024-03-15
- * @modify date 2024-03-15
  */
 
-
 #include "TimeUtil.h"
+#include <ArduinoLog.h>
 
-int TimeUtil::getTimeDifference(String currentTime, String compareTime)
+long TimeUtil::getTimeDifference(String currentTime, String compareTime)
 {
     int result = 0;
 
-    int secondsInDay = 24 * 3600;
+    int secondsInDay = HOURS_IN_DAY * SECOND_IN_HOUR;
 
     int currTimestamp = toTimeStamp(currentTime);
     int compTimestamp = toTimeStamp(compareTime);
@@ -28,10 +26,13 @@ int TimeUtil::getTimeDifference(String currentTime, String compareTime)
         result = compTimestamp - currTimestamp;
     }
 
-    return result * 1000;
+    long difference = result * MILLISECONDS;
+    Log.info("TimeUtil::getTimeDifference currentTime: %s, compareTime: %s, difference: %d" CR,
+             currentTime, compareTime, difference);
+    return difference;
 }
 
-int TimeUtil::toTimeStamp(String time)
+long TimeUtil::toTimeStamp(String time)
 {
     String timeH = time.substring(0, time.indexOf(":"));
     time.replace(timeH + ":", " ");
@@ -41,5 +42,37 @@ int TimeUtil::toTimeStamp(String time)
     time.trim();
     int timeS = time.toInt();
 
-    return (timeH.toInt() * 360) + (timeM.toInt() * 60) + timeS;
+    long result = (timeH.toInt() * SECOND_IN_HOUR) + (timeM.toInt() * SECONDS) + timeS;
+    Log.info("TimeUtil::toTimeStamp result: %d" CR, result);
+    return result;
+}
+
+int TimeUtil::extractSeconds(long timeStamp)
+{
+    long seconds = timeStamp / MILLISECONDS;
+    int result = seconds % SECONDS;
+    return result;
+}
+
+int TimeUtil::extractMinutes(long timeStamp)
+{
+    long seconds = timeStamp / MILLISECONDS;
+    int result = (seconds % SECOND_IN_HOUR) / SECONDS;
+    return result;
+}
+
+int TimeUtil::extractHours(long timeStamp)
+{
+    long seconds = timeStamp / MILLISECONDS;
+    int result = seconds / SECOND_IN_HOUR;
+    return result;
+}
+
+String TimeUtil::toTimeString(long timeStamp)
+{
+    int hours = extractHours(timeStamp);
+    int minutes = extractMinutes(timeStamp);
+    int seconds = extractSeconds(timeStamp);
+    String result = String(hours) + ":" + String(minutes) + ":" + String(seconds);
+    return result;
 }

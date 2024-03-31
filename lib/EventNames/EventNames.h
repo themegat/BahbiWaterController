@@ -1,8 +1,6 @@
 /**
  * @author T Motsoeneng
  * @email tshepomotsoeneng0@gmail.com
- * @create date 2024-03-15
- * @modify date 2024-03-15
  */
 
 
@@ -19,6 +17,8 @@ class EventNames {
         static char *ScheduleStart;
         static char *LogSartUpEvent;
         static char *LogPumpRunEvent;
+        static char *ScheduleSleepEvent;
+
 };
 
 #endif
