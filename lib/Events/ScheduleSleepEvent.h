@@ -47,16 +47,20 @@ void doSleep()
     String key = netTime.getTimeString();
     String date = netTime.getDateString();
 
-    fire.append(FireInterface::SLEEP_INFO_PATH + "/" + date, key, payload);
-
-    uint64 maxSleep = 40 * TimeUtil::SECONDS * TimeUtil::MICROSECONDS;
+    uint64 maxSleep = 30 * TimeUtil::SECONDS * TimeUtil::MICROSECONDS;
     uint64 wakeTimeMicros = wakeAt * TimeUtil::MILLISECONDS;
 
     if (wakeTimeMicros > maxSleep)
     {
         Log.info("Sleep duration too long: %l. Resetting duration." CR, wakeTimeMicros / 1000);
         wakeTimeMicros = maxSleep;
+
+        item.key = "sleep-duration-adjusted";
+        item.value = TimeUtil::toTimeString(wakeTimeMicros / TimeUtil::MILLISECONDS);
+        payload.push_back(item);
     }
+
+    fire.append(FireInterface::SLEEP_INFO_PATH + "/" + date, key, payload);
     Log.info("Sleep duration: %l." CR, wakeTimeMicros);
     ESP.deepSleep(wakeTimeMicros, RF_DEFAULT);
 }
