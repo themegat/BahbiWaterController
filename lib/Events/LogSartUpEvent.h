@@ -1,8 +1,6 @@
 /**
  * @author T Motsoeneng
- * @email tshepomotsoeneng0@gmail.com
- * @create date 2024-03-16
- * @modify date 2024-03-16
+ * @link https://github.com/themegat
  */
 
 
@@ -37,16 +35,25 @@ LogSartUpEvent::LogSartUpEvent()
 
 void LogSartUpEvent::execute(Event evt)
 {
-    FireMap item;
-    item.key = "active";
-    item.value = "true";
+    std::vector<FireStringMap> payload;
 
-    std::vector<FireMap> payload;
+    FireStringMap item;
+    item.key = "operating-voltage";
+    item.value = ESP.getVcc();
     payload.push_back(item);
 
-    String key = "D" + netTime.getDateString() + "T" + netTime.getTimeString();
+    item.key = "restart-reason";
+    item.value = ESP.getResetReason();
+    payload.push_back(item);
 
-    fire.append("dateTimeOn", key, payload);
+    item.key = "sketch-version-md5";
+    item.value = ESP.getSketchMD5();
+    payload.push_back(item);
+
+    String date = netTime.getDateString();
+    String key = netTime.getTimeString();
+
+    fire.append(FireInterface::WAKE_INFO_PATH + "/" + date, key, payload);
 }
 
 #endif

@@ -1,10 +1,7 @@
 /**
  * @author T Motsoeneng
- * @email tshepomotsoeneng0@gmail.com
- * @create date 2024-03-15
- * @modify date 2024-03-15
+ * @link https://github.com/themegat
  */
-
 
 #include "FireSubscriptions.h"
 #include "EventNames.h"
@@ -44,8 +41,6 @@ void FireSubscriptions::runDurationSeconds(String path, String state)
 {
     if (path.indexOf("runDurationSeconds") != -1)
     {
-        // char *value = "";
-        // itoa(state, value, 10);
         Event event(EventNames::SetPumpRunDuration, state.c_str());
         evtManager.trigger(event);
     }
@@ -76,5 +71,14 @@ void FireSubscriptions::pumpSchedule(String path, String state)
             Event event(EventNames::SetPumpSchedule, state.c_str());
             evtManager.trigger(event);
         }
+    }
+}
+
+void FireSubscriptions::scheduleSleep(String path, String state)
+{
+    if (path.indexOf("scheduleSleep") != -1)
+    {
+        Event event(EventNames::ScheduleSleepEvent, state.c_str());
+        evtManager.trigger(event);
     }
 }

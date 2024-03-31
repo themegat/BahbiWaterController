@@ -1,8 +1,6 @@
 /**
  * @author T Motsoeneng
- * @email tshepomotsoeneng0@gmail.com
- * @create date 2024-03-15
- * @modify date 2024-03-15
+ * @link https://github.com/themegat
  */
 
 
@@ -20,6 +18,7 @@ class FireSubscriptions {
         static void pumpPressure(String path, String state);
         static void runDurationSeconds(String path, String state);
         static void pumpSchedule(String path, String state);
+        static void scheduleSleep(String path, String state);
     private:
 };
 

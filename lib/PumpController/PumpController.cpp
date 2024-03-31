@@ -1,8 +1,6 @@
 /**
  * @author T Motsoeneng
- * @email tshepomotsoeneng0@gmail.com
- * @create date 2024-03-15
- * @modify date 2024-03-15
+ * @link https://github.com/themegat
  */
 
 #include "PumpController.h"
@@ -164,6 +162,7 @@ String PumpController::getStopDateTime()
 
 void PumpController::_printSchedules()
 {
+    Log.infoln("");
     for (String sc : _schedules)
     {
         Log.info("Schedule :: %s" CR, sc.c_str());

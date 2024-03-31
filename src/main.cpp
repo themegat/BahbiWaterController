@@ -1,8 +1,6 @@
 /**
  * @author T Motsoeneng
- * @email tshepomotsoeneng0@gmail.com
- * @create date 2024-03-15
- * @modify date 2024-03-15
+ * @link https://github.com/themegat
  */
 
 #include <Arduino.h>
@@ -26,12 +24,15 @@
 #include "SchedulePumpStartEvent.h"
 #include "LogSartUpEvent.h"
 #include "LogPumpRunEvent.h"
+#include "ScheduleSleepEvent.h"
 
 #include "EventNames.h"
 
 #include <string>
 #include <iostream>
 #include "NetTime.h"
+
+ADC_MODE(ADC_VCC);
 
 PumpController pumpCtrl(4, 13, 12, 14);
 
@@ -52,6 +53,7 @@ PumpScheduleEvent pumpScheduleEvent;
 SchedulePumpStartEvent schedulePumpStartEvent;
 LogSartUpEvent logSartUpEvent;
 LogPumpRunEvent logPumpRunEvent;
+ScheduleSleepEvent scheduleSleepEvent;
 
 NetTime netTime(Configuration::timeZone, 0, Configuration::ntpServer);
 
@@ -62,6 +64,7 @@ Task taskServer(1, TASK_FOREVER, &serverListen, &runner, true);
 Task taskStartPump(TASK_SCHEDULE_NC, TASK_ONCE, &eventStartPump, &runner, false);
 Task taskStopPump(TASK_SCHEDULE_NC, TASK_ONCE, &eventStopPump, &runner, false);
 Task taskLogPumpRuns(TASK_SCHEDULE_NC, TASK_ONCE, NULL, &runner, false);
+Task taskSleep(TASK_SCHEDULE_NC, TASK_ONCE, NULL, &runner, false);
 
 void readFromFire();
 void connectWifi();
@@ -96,6 +99,7 @@ void setup()
   evtManager.subscribe(Subscriber(EventNames::ScheduleStart, &schedulePumpStartEvent));
   evtManager.subscribe(Subscriber(EventNames::LogSartUpEvent, &logSartUpEvent));
   evtManager.subscribe(Subscriber(EventNames::LogPumpRunEvent, &logPumpRunEvent));
+  evtManager.subscribe(Subscriber(EventNames::ScheduleSleepEvent, &scheduleSleepEvent));
 
   Event event(EventNames::LogSartUpEvent);
   evtManager.trigger(event);

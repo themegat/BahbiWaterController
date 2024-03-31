@@ -1,3 +1,8 @@
+/**
+ * @author T Motsoeneng
+ * @link https://github.com/themegat
+**/
+
 #include <Arduino.h>
 #include "Event.h"
 #include "PumpController.h"
@@ -39,7 +44,7 @@ void SchedulePumpStartEvent::execute(Event evt)
     String currentTime = netTime.getHour() + ":" + netTime.getMinute() + ":" + netTime.getSecond();
     Log.info("Setting schedule at : %s"CR, currentTime.c_str());
     String nextSchedule = pumpCtrl.getNextSchedule(currentTime);
-    int netxRun = TimeUtil::getTimeDifference(currentTime, nextSchedule);
+    long netxRun = TimeUtil::getTimeDifference(currentTime, nextSchedule);
     taskStartPump.restartDelayed(netxRun);
     taskStopPump.restartDelayed(netxRun + (pumpCtrl.getRunDuration() * 1000));
     Log.info("SchedulePumpStartEvent:: Next run at %s"CR, nextSchedule);
