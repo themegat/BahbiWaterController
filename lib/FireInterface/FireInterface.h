@@ -1,6 +1,6 @@
 /**
  * @author T Motsoeneng
- * @email tshepomotsoeneng0@gmail.com
+ * @link https://github.com/themegat
  */
 
 #include <Arduino.h>

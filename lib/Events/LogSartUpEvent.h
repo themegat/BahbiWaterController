@@ -1,6 +1,6 @@
 /**
  * @author T Motsoeneng
- * @email tshepomotsoeneng0@gmail.com
+ * @link https://github.com/themegat
  */
 
 
@@ -49,7 +49,7 @@ void LogSartUpEvent::execute(Event evt)
     item.key = "sketch-version-md5";
     item.value = ESP.getSketchMD5();
     payload.push_back(item);
-    
+
     String date = netTime.getDateString();
     String key = netTime.getTimeString();
 
