@@ -22,7 +22,6 @@ extern HttpServer httpServer;
 
 uint64 wakeAt = 0;
 String wakeTime = "";
-String sleepReason = "";
 
 void doSleep()
 {
@@ -36,10 +35,6 @@ void doSleep()
     item.value = sleepTime;
     payload.push_back(item);
 
-    item.key = "sleep-reason";
-    item.value = sleepReason;
-    payload.push_back(item);
-
     item.key = "sleep-duration";
     item.value = TimeUtil::toTimeString(wakeAt);
     payload.push_back(item);
@@ -49,6 +44,7 @@ void doSleep()
 
     uint64 maxSleep = 30 * TimeUtil::SECONDS * TimeUtil::MICROSECONDS;
     uint64 wakeTimeMicros = wakeAt * TimeUtil::MILLISECONDS;
+    String sleepReason = "Scheduled Sleep";
 
     if (wakeTimeMicros > maxSleep)
     {
@@ -57,8 +53,13 @@ void doSleep()
 
         item.key = "sleep-duration-adjusted";
         item.value = TimeUtil::toTimeString(wakeTimeMicros / TimeUtil::MILLISECONDS);
+        sleepReason = "Deep-Sleep Cycle";
         payload.push_back(item);
     }
+
+    item.key = "sleep-reason";
+    item.value = sleepReason;
+    payload.push_back(item);
 
     fire.append(FireInterface::SLEEP_INFO_PATH + "/" + date, key, payload);
     Log.info("Sleep duration: %l." CR, wakeTimeMicros);
@@ -88,20 +89,14 @@ void ScheduleSleepEvent::execute(Event evt)
     extra.replace(sleepTime + "-", " ");
     extra.trim();
     wakeTime = extra;
+    String currentTime = netTime.getHour() + ":" + netTime.getMinute() + ":" + netTime.getSecond();
+    long sleepAt = TimeUtil::getTimeBetween(currentTime, sleepTime) * TimeUtil::MILLISECONDS;
+    wakeAt = TimeUtil::getTimeBetween(currentTime, wakeTime) * TimeUtil::MILLISECONDS;
 
-    long currentTimestamp = TimeUtil::toTimeStamp(netTime.getTimeString());
-    long wakeTimestamp = TimeUtil::toTimeStamp(wakeTime);
-    long sleepTimestamp = TimeUtil::toTimeStamp(sleepTime);
-
-    long sleepAt = TimeUtil::getTimeDifference(netTime.getTimeString(), sleepTime);
-    wakeAt = TimeUtil::getTimeDifference(sleepTime, wakeTime);
-    sleepReason = "Scheduled Sleep";
-
-    if (currentTimestamp > sleepTimestamp && currentTimestamp <= wakeTimestamp)
+    if (TimeUtil::isBetween(sleepTime, wakeTime, currentTime))
     {
         sleepAt = 0;
-        wakeAt = TimeUtil::getTimeDifference(netTime.getTimeString(), wakeTime);
-        sleepReason = "Deep-Sleep Cycle";
+        sleepTime = currentTime;
     }
 
     Log.info("Scheduling sleep at: %s - Wake at: %s" CR, sleepTime.c_str(), wakeTime.c_str());

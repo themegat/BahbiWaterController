@@ -44,9 +44,9 @@ void SchedulePumpStartEvent::execute(Event evt)
     String currentTime = netTime.getHour() + ":" + netTime.getMinute() + ":" + netTime.getSecond();
     Log.info("Setting schedule at : %s"CR, currentTime.c_str());
     String nextSchedule = pumpCtrl.getNextSchedule(currentTime);
-    long netxRun = TimeUtil::getTimeDifference(currentTime, nextSchedule);
+    long netxRun = TimeUtil::getTimeBetween(currentTime, nextSchedule) * TimeUtil::MILLISECONDS;
     taskStartPump.restartDelayed(netxRun);
-    taskStopPump.restartDelayed(netxRun + (pumpCtrl.getRunDuration() * 1000));
+    taskStopPump.restartDelayed(netxRun + (pumpCtrl.getRunDuration() * TimeUtil::MILLISECONDS));
     Log.info("SchedulePumpStartEvent:: Next run at %s"CR, nextSchedule);
 }
 
