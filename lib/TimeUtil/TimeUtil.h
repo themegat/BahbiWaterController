@@ -11,14 +11,25 @@
 class TimeUtil
 {
 public:
+
     /**
-     * Gets the time difference between two time strings
+     * Checks if the currentTime is between fromTime and toTime
+     * @param fromTime
+     * @param toTime
+     * @param currentTime
+     * @returns bool
+     * @example "12:00:00", "13:00:00", "12:30:00" -> true
+     */
+    static bool isBetween(String fromTime, String toTime, String currentTime);
+
+    /**
+     * Gets the time in milliseconds between two time strings
      * @param currentTime
      * @param compareTime
      * @returns long
      * @example "12:00:00", "13:00:00" -> 3600
      */
-    static long getTimeDifference(String currentTime, String compareTime);
+    static long getTimeBetween(String currentTime, String compareTime);
 
     /**
      * Converts the time string to timestamp
