@@ -4,32 +4,47 @@
  */
 
 #include "TimeUtil.h"
+#ifndef TEST_FLAG
 #include <ArduinoLog.h>
+#endif
 
-long TimeUtil::getTimeDifference(String currentTime, String compareTime)
+long TimeUtil::getTimeBetween(String fromTime, String toTime)
 {
-    int result = 0;
-
+    long fT = toTimeStamp(fromTime);
+    long tT = toTimeStamp(toTime);
     int secondsInDay = HOURS_IN_DAY * SECOND_IN_HOUR;
 
-    int currTimestamp = toTimeStamp(currentTime);
-    int compTimestamp = toTimeStamp(compareTime);
-
-    int timeDiff = compTimestamp - currTimestamp;
-
-    if (timeDiff < 0)
+    if (tT < fT)
     {
-        result = (secondsInDay - currTimestamp) + compTimestamp;
-    }
-    else
-    {
-        result = compTimestamp - currTimestamp;
+        tT = tT + secondsInDay;
     }
 
-    long difference = result * MILLISECONDS;
-    Log.info("TimeUtil::getTimeDifference currentTime: %s, compareTime: %s, difference: %d" CR,
-             currentTime, compareTime, difference);
+    long difference = tT - fT;
+#ifndef TEST_FLAG
+    Log.info("TimeUtil::getTimeBetween fromTime: %s, toTime: %s, difference: %d" CR,
+             fromTime, toTime, difference);
+#endif
     return difference;
+}
+
+bool TimeUtil::isBetween(String fromTime, String toTime, String currentTime)
+{
+    long fT = toTimeStamp(fromTime);
+    long tT = toTimeStamp(toTime);
+    long cT = toTimeStamp(currentTime);
+    int secondsInDay = HOURS_IN_DAY * SECOND_IN_HOUR;
+
+    if (cT < fT && cT < tT)
+    {
+        cT = cT + secondsInDay;
+    }
+
+    if (tT < fT)
+    {
+        tT = tT + secondsInDay;
+    }
+
+    return cT > fT && cT < tT;
 }
 
 long TimeUtil::toTimeStamp(String time)
@@ -43,7 +58,9 @@ long TimeUtil::toTimeStamp(String time)
     int timeS = time.toInt();
 
     long result = (timeH.toInt() * SECOND_IN_HOUR) + (timeM.toInt() * SECONDS) + timeS;
+#ifndef TEST_FLAG
     Log.info("TimeUtil::toTimeStamp result: %d" CR, result);
+#endif
     return result;
 }
 
