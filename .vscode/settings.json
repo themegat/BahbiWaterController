@@ -75,5 +75,6 @@
         "iostream": "cpp",
         "istream": "cpp",
         "sstream": "cpp"
-    }
+    },
+    "docwriter.style": "GoDoc"
 }
